@@ -6,7 +6,6 @@
     <title>ExamMaster - Trang chủ</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
     <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
@@ -18,14 +17,18 @@
                         "background-dark": "#101922",
                     },
                     fontFamily: {
-                        "display": ["Inter", "sans-serif"]
+                        "display": ["Inter", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"]
                     },
                 },
             },
         }
     </script>
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
         .subject-card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
     </style>
 </head>
@@ -36,7 +39,9 @@
             <div class="flex justify-between items-center h-16">
                 <div class="flex items-center gap-8">
                     <a class="flex items-center gap-2 text-primary" href="home.html">
-                        <span class="material-symbols-outlined text-3xl font-bold">analytics</span>
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
                         <span class="text-slate-900 dark:text-white text-xl font-extrabold tracking-tight">ExamMaster</span>
                     </a>
                     <nav class="hidden md:flex items-center gap-6">
@@ -47,8 +52,10 @@
                 </div>
                 <div class="flex items-center gap-4">
                     <div class="hidden lg:flex items-center bg-slate-100 dark:bg-slate-800 rounded-lg px-3 py-1.5 border border-transparent focus-within:border-primary/50 transition-all">
-                        <span class="material-symbols-outlined text-slate-400 text-xl">search</span>
-                        <input class="bg-transparent border-none focus:ring-0 text-sm w-48 placeholder:text-slate-400" placeholder="Tìm kiếm môn thi..." type="text"/>
+                        <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                        <input class="bg-transparent border-none focus:ring-0 text-sm w-48 placeholder:text-slate-400 ml-2" placeholder="Tìm kiếm môn thi..." type="text"/>
                     </div>
                     <span class="text-sm font-medium text-slate-600 dark:text-slate-300" id="userName"></span>
                     <button class="text-sm font-bold text-slate-700 dark:text-slate-200 hover:text-primary px-4 py-2 transition-colors" onclick="logout()">Đăng xuất</button>
@@ -70,9 +77,11 @@
                             Chọn môn thi bên dưới để bắt đầu làm bài. Hệ thống sẽ tự động chấm điểm và lưu kết quả.
                         </p>
                         <div class="flex flex-col sm:flex-row gap-4">
-                            <button class="bg-primary hover:bg-primary/90 text-white font-bold px-8 py-4 rounded-xl text-lg transition-all flex items-center justify-center gap-2 shadow-xl shadow-primary/30">
+                            <button type="button" class="bg-primary hover:bg-primary/90 text-white font-bold px-8 py-4 rounded-xl text-lg transition-all flex items-center justify-center gap-2 shadow-xl shadow-primary/30" onclick="document.getElementById('subjectList').scrollIntoView({behavior: 'smooth'})">
                                 Bắt đầu thi ngay
-                                <span class="material-symbols-outlined">arrow_forward</span>
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                                </svg>
                             </button>
                         </div>
                         <div class="mt-8 flex items-center gap-6">
@@ -90,7 +99,9 @@
                             <img class="w-full h-auto object-cover aspect-[4/3]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCn9vDC56iLm8CFtUiwhAkmuE4-4KQ5X54YMya0Y3_mW-5E0TV3NFowC8Gcod7Wvq6RCQrJ_w6VwmZFKt8BsGYMIjUn-AON8rflDs6ZyJHU39XLFlqlWo15q3BTAqCFruLQ1S50QtXQqU4nvb73dUa7ZS_HTM1c9kiYF9Xhnk32uUWzGh7JhfyoPWQnmRxOEs5umk6KfFybCyYq-sWWTjQEjAohh3u7V6kZ4YnUmv2qjBXyN9-wFD-Hb1rvk3E5xvg3eurBPS1EfOs" alt="Giao diện thi trực tuyến"/>
                             <div class="absolute bottom-6 left-6 right-6 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md p-4 rounded-xl border border-white/20 shadow-lg flex items-center gap-4">
                                 <div class="bg-green-500/20 p-2 rounded-lg">
-                                    <span class="material-symbols-outlined text-green-600">check_circle</span>
+                                    <svg class="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                    </svg>
                                 </div>
                                 <div>
                                     <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Điểm mới nhất</p>
@@ -150,21 +161,27 @@
                 <div class="grid md:grid-cols-3 gap-8">
                     <div class="bg-slate-50 dark:bg-slate-800 p-8 rounded-2xl border border-slate-200 dark:border-slate-700 hover:shadow-xl transition-all group">
                         <div class="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center text-primary mb-6 group-hover:bg-primary group-hover:text-white transition-colors">
-                            <span class="material-symbols-outlined text-3xl">timer</span>
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
                         </div>
                         <h4 class="text-xl font-bold text-slate-900 dark:text-white mb-4">Thi có thời gian</h4>
                         <p class="text-slate-600 dark:text-slate-400 leading-relaxed">Mô phỏng môi trường thi thực tế để cải thiện tốc độ và độ chính xác.</p>
                     </div>
                     <div class="bg-slate-50 dark:bg-slate-800 p-8 rounded-2xl border border-slate-200 dark:border-slate-700 hover:shadow-xl transition-all group">
                         <div class="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center text-primary mb-6 group-hover:bg-primary group-hover:text-white transition-colors">
-                            <span class="material-symbols-outlined text-3xl">bolt</span>
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                            </svg>
                         </div>
                         <h4 class="text-xl font-bold text-slate-900 dark:text-white mb-4">Kết quả ngay lập tức</h4>
                         <p class="text-slate-600 dark:text-slate-400 leading-relaxed">Nhận điểm số và phân tích chi tiết ngay sau khi nộp bài.</p>
                     </div>
                     <div class="bg-slate-50 dark:bg-slate-800 p-8 rounded-2xl border border-slate-200 dark:border-slate-700 hover:shadow-xl transition-all group">
                         <div class="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center text-primary mb-6 group-hover:bg-primary group-hover:text-white transition-colors">
-                            <span class="material-symbols-outlined text-3xl">bar_chart_4_bars</span>
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                            </svg>
                         </div>
                         <h4 class="text-xl font-bold text-slate-900 dark:text-white mb-4">Thống kê chi tiết</h4>
                         <p class="text-slate-600 dark:text-slate-400 leading-relaxed">Theo dõi tiến độ học tập với các biểu đồ trực quan.</p>
@@ -179,13 +196,45 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col md:flex-row justify-between items-center gap-4">
                 <div class="flex items-center gap-3">
-                    <span class="material-symbols-outlined text-primary text-2xl font-bold">analytics</span>
+                    <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
                     <span class="text-slate-900 dark:text-white text-lg font-bold">ExamMaster</span>
                 </div>
-                <p class="text-slate-500 text-sm">© 2024 ExamMaster. All rights reserved.</p>
+                <p class="text-slate-500 text-sm">© 2026 ExamMaster - PhanNhatDuy</p>
             </div>
         </div>
     </footer>
+
+    <!-- Custom Confirm Modal -->
+    <div id="confirmModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-md w-full transform transition-all scale-95 opacity-0" id="confirmModalContent">
+            <!-- Icon -->
+            <div class="flex justify-center pt-8 pb-4">
+                <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
+                    <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="px-8 pb-6 text-center">
+                <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Bắt đầu thi</h3>
+                <p class="text-slate-600 dark:text-slate-400" id="confirmMessage">Bạn có muốn bắt đầu thi môn này không?</p>
+            </div>
+
+            <!-- Buttons -->
+            <div class="flex gap-3 px-8 pb-8">
+                <button type="button" onclick="closeConfirmModal()" class="flex-1 px-6 py-3 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 rounded-xl font-medium hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
+                    Hủy
+                </button>
+                <button type="button" onclick="confirmAction()" class="flex-1 px-6 py-3 bg-primary text-white rounded-xl font-medium hover:bg-primary/90 transition-colors shadow-lg shadow-primary/30">
+                    Bắt đầu thi
+                </button>
+            </div>
+        </div>
+    </div>
 
     <script src="js/api.js"></script>
     <script>
@@ -197,10 +246,7 @@
 
         document.getElementById('userName').textContent = user.fullName || user.username;
 
-        // Subject icons
-        const icons = ['📚', '🔬', '💻', '🌐', '📊', '🧮', '🔤', '🧠', '🎨', '⚙️', '📐', '🌍'];
-        
-        // Subject images (placeholder gradient backgrounds)
+        // Subject gradient backgrounds
         const gradients = [
             'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
             'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
@@ -229,28 +275,80 @@
                 container.innerHTML = subjects.map((subject, index) => `
                     <div class="group relative bg-slate-50 dark:bg-slate-800 rounded-2xl overflow-hidden cursor-pointer hover:shadow-xl transition-all" onclick="startExam(${subject.SubjectID}, '${subject.SubjectName}')">
                         <div class="aspect-[4/3] relative overflow-hidden" style="background: ${gradients[index % gradients.length]}">
-                            <div class="absolute inset-0 flex items-center justify-center">
-                                <span class="text-6xl">${icons[index % icons.length]}</span>
-                            </div>
                             <div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent"></div>
+                            <div class="absolute bottom-4 left-4 right-4">
+                                <h5 class="text-xl font-bold text-white mb-1">${subject.SubjectName}</h5>
+                            </div>
                         </div>
                         <div class="p-5">
-                            <h5 class="text-lg font-bold text-slate-900 dark:text-white mb-2 group-hover:text-primary transition-colors">${subject.SubjectName}</h5>
                             <p class="text-slate-500 dark:text-slate-400 text-sm line-clamp-2">${subject.Description || 'Bấm để bắt đầu thi'}</p>
                         </div>
                     </div>
-                `);
+                `).join('');
             } catch (error) {
                 console.error('Error:', error);
                 document.getElementById('subjectList').innerHTML = '<div class="col-span-full text-center py-12"><p class="text-red-500">Lỗi tải danh sách môn thi</p></div>';
             }
         }
 
+        // Custom confirm modal variables
+        let pendingExamId = null;
+        let pendingExamName = null;
+
         function startExam(subjectId, subjectName) {
-            if (confirm(`Bạn có muốn bắt đầu thi môn "${subjectName}" không?`)) {
-                window.location.href = `exam.html?subjectId=${subjectId}&subjectName=${encodeURIComponent(subjectName)}`;
+            pendingExamId = subjectId;
+            pendingExamName = subjectName;
+            document.getElementById('confirmMessage').textContent = `Bạn có muốn bắt đầu thi môn "${subjectName}" không?`;
+            showConfirmModal();
+        }
+
+        function showConfirmModal() {
+            const modal = document.getElementById('confirmModal');
+            const content = document.getElementById('confirmModalContent');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+
+            // Trigger animation
+            setTimeout(() => {
+                content.classList.remove('scale-95', 'opacity-0');
+                content.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        function closeConfirmModal() {
+            const modal = document.getElementById('confirmModal');
+            const content = document.getElementById('confirmModalContent');
+
+            content.classList.remove('scale-100', 'opacity-100');
+            content.classList.add('scale-95', 'opacity-0');
+
+            setTimeout(() => {
+                modal.classList.remove('flex');
+                modal.classList.add('hidden');
+                pendingExamId = null;
+                pendingExamName = null;
+            }, 200);
+        }
+
+        function confirmAction() {
+            if (pendingExamId && pendingExamName) {
+                window.location.href = `exam.html?subjectId=${pendingExamId}&subjectName=${encodeURIComponent(pendingExamName)}`;
             }
         }
+
+        // Close modal when clicking outside
+        document.getElementById('confirmModal')?.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeConfirmModal();
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeConfirmModal();
+            }
+        });
 
         function logout() {
             localStorage.removeItem('token');

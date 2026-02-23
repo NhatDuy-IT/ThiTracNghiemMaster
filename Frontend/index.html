@@ -5,8 +5,7 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>ExamMaster - Đăng nhập & Đăng ký</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
     <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
@@ -18,14 +17,18 @@
                         "background-dark": "#101922",
                     },
                     fontFamily: {
-                        "display": ["Inter"]
+                        "display": ["Inter", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"]
                     },
                 },
             },
         }
     </script>
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
         .auth-split-bg { background: linear-gradient(135deg, #137fec 0%, #0a4fa1 100%); }
         .hidden { display: none; }
     </style>
@@ -89,8 +92,13 @@
 
                 <!-- Social Logins -->
                 <div class="grid grid-cols-2 gap-4 mb-8">
-                    <button class="flex items-center justify-center gap-2 px-4 py-2.5 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-sm font-medium text-slate-700 dark:text-slate-300">
-                        <img alt="Google" class="w-5 h-5" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZv-AqpXU1BKpxPVEt0Db5gkmfu4ecZIWC9yJq1uQ7c6XKyTU6bKzJtoeuuO6ah2j-ZDEt4d3lDyOCdx-OMOVDKahAY5In-AamiNldxSfh4aYc2MCo95Bz6PmnGBDkclR16mriphuyXacEF4zob0AmRfLROCiVtCwh3h92p0GHQGqo9rIl_G8lUvHCJ5Utgu1a_YsUEU_1L05xW6vrc54fo_P-SrHq1Zcks4HhPMvwQqT9aam9EQykEkwxjfjifjmEKGiOfOw74Ps"/>
+                    <button type="button" class="flex items-center justify-center gap-2 px-4 py-2.5 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-sm font-medium text-slate-700 dark:text-slate-300">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24">
+                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                        </svg>
                         Google
                     </button>
                     <button class="flex items-center justify-center gap-2 px-4 py-2.5 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-sm font-medium text-slate-700 dark:text-slate-300">
@@ -115,7 +123,9 @@
                     <div>
                         <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5" for="loginUsername">Tên đăng nhập</label>
                         <div class="relative">
-                            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">person</span>
+                            <svg class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                            </svg>
                             <input class="block w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800 border-none rounded-lg focus:ring-2 focus:ring-primary text-slate-900 dark:text-white placeholder:text-slate-400" id="loginUsername" placeholder="Nhập tên đăng nhập" type="text" required/>
                         </div>
                     </div>
@@ -124,10 +134,15 @@
                             <label class="block text-sm font-medium text-slate-700 dark:text-slate-300" for="loginPassword">Mật khẩu</label>
                         </div>
                         <div class="relative">
-                            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">lock</span>
+                            <svg class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                            </svg>
                             <input class="block w-full pl-10 pr-12 py-2.5 bg-slate-50 dark:bg-slate-800 border-none rounded-lg focus:ring-2 focus:ring-primary text-slate-900 dark:text-white placeholder:text-slate-400" id="loginPassword" placeholder="Nhập mật khẩu" type="password" required/>
-                            <button class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors" type="button" onclick="togglePassword('loginPassword')">
-                                <span class="material-symbols-outlined text-[20px]">visibility</span>
+                            <button class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors" type="button" onclick="togglePassword('loginPassword')" title="Hiện/Ẩn mật khẩu">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                </svg>
                             </button>
                         </div>
                     </div>
@@ -141,31 +156,42 @@
                     <div>
                         <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5" for="registerUsername">Tên đăng nhập</label>
                         <div class="relative">
-                            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">person</span>
+                            <svg class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                            </svg>
                             <input class="block w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800 border-none rounded-lg focus:ring-2 focus:ring-primary text-slate-900 dark:text-white placeholder:text-slate-400" id="registerUsername" placeholder="Nhập tên đăng nhập" type="text" required/>
                         </div>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5" for="registerFullName">Họ và tên</label>
                         <div class="relative">
-                            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">badge</span>
+                            <svg class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
                             <input class="block w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800 border-none rounded-lg focus:ring-2 focus:ring-primary text-slate-900 dark:text-white placeholder:text-slate-400" id="registerFullName" placeholder="Nhập họ và tên" type="text"/>
                         </div>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5" for="registerEmail">Email</label>
                         <div class="relative">
-                            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">mail</span>
+                            <svg class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                            </svg>
                             <input class="block w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800 border-none rounded-lg focus:ring-2 focus:ring-primary text-slate-900 dark:text-white placeholder:text-slate-400" id="registerEmail" placeholder="name@example.com" type="email"/>
                         </div>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5" for="registerPassword">Mật khẩu</label>
                         <div class="relative">
-                            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">lock</span>
+                            <svg class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                            </svg>
                             <input class="block w-full pl-10 pr-12 py-2.5 bg-slate-50 dark:bg-slate-800 border-none rounded-lg focus:ring-2 focus:ring-primary text-slate-900 dark:text-white placeholder:text-slate-400" id="registerPassword" placeholder="Nhập mật khẩu" type="password" required/>
-                            <button class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors" type="button" onclick="togglePassword('registerPassword')">
-                                <span class="material-symbols-outlined text-[20px]">visibility</span>
+                            <button class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors" type="button" onclick="togglePassword('registerPassword')" title="Hiện/Ẩn mật khẩu">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                </svg>
                             </button>
                         </div>
                     </div>
@@ -180,7 +206,9 @@
 
                 <div class="mt-12 flex justify-center items-center gap-2">
                     <div class="p-2 rounded-full bg-slate-100 dark:bg-slate-800">
-                        <span class="material-symbols-outlined text-slate-600 dark:text-slate-400 text-[18px]">support_agent</span>
+                        <svg class="w-5 h-5 text-slate-600 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/>
+                        </svg>
                     </div>
                     <span class="text-sm text-slate-600 dark:text-slate-400">Cần hỗ trợ? <a class="font-medium text-slate-900 dark:text-white hover:underline" href="#">Liên hệ</a></span>
                 </div>
@@ -188,7 +216,30 @@
         </div>
     </div>
 
+    <!-- Alert Modal -->
+    <div id="alertModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-md w-full transform transition-all scale-95 opacity-0" id="alertModalContent">
+            <div class="flex justify-center pt-8 pb-4" id="alertIcon">
+                <div class="w-16 h-16 bg-blue-500/10 rounded-full flex items-center justify-center">
+                    <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="px-8 pb-6 text-center">
+                <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2" id="alertTitle">Thông báo</h3>
+                <p class="text-slate-600 dark:text-slate-400" id="alertMessage">Nội dung thông báo</p>
+            </div>
+            <div class="px-8 pb-8">
+                <button type="button" onclick="closeAlert()" class="w-full px-6 py-3 bg-primary text-white rounded-xl font-medium hover:bg-primary/90 transition-colors shadow-lg shadow-primary/30">
+                    Đóng
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script src="js/api.js"></script>
+    <script src="js/modal.js"></script>
     <script>
         // Toggle between Login and Register forms
         function showLogin() {
@@ -234,17 +285,17 @@
                 if (response.ok) {
                     localStorage.setItem('token', data.token);
                     localStorage.setItem('user', JSON.stringify(data.user));
-                    
+
                     if (data.user.role === 'Admin') {
                         window.location.href = 'admin.html';
                     } else {
                         window.location.href = 'home.html';
                     }
                 } else {
-                    alert(data.error || 'Đăng nhập thất bại');
+                    showAlert(data.error || 'Đăng nhập thất bại', 'error');
                 }
             } catch (error) {
-                alert('Lỗi kết nối. Vui lòng thử lại.');
+                showAlert('Lỗi kết nối. Vui lòng thử lại.', 'error');
             }
         }
 
@@ -261,13 +312,13 @@
                 const data = await response.json();
 
                 if (response.ok) {
-                    alert('Đăng ký thành công! Vui lòng đăng nhập.');
-                    showLogin();
+                    showAlert('Đăng ký thành công! Vui lòng đăng nhập.', 'success');
+                    setTimeout(() => showLogin(), 1500);
                 } else {
-                    alert(data.error || 'Đăng ký thất bại');
+                    showAlert(data.error || 'Đăng ký thất bại', 'error');
                 }
             } catch (error) {
-                alert('Lỗi kết nối. Vui lòng thử lại.');
+                showAlert('Lỗi kết nối. Vui lòng thử lại.', 'error');
             }
         }
 

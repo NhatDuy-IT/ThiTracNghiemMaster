@@ -107,7 +107,22 @@ const adminAPI = {
     }),
     
     // Exam History
-    getAllExamHistory: () => authenticatedFetch(`${BASE_URL}/admin/exam-history`)
+    getAllExamHistory: () => authenticatedFetch(`${BASE_URL}/admin/exam-history`),
+
+    // Users
+    getUsers: () => authenticatedFetch(`${BASE_URL}/admin/users`),
+    getUser: (id) => authenticatedFetch(`${BASE_URL}/admin/users/${id}`),
+    updateUser: (id, data) => authenticatedFetch(`${BASE_URL}/admin/users/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(data)
+    }),
+    deleteUser: (id) => authenticatedFetch(`${BASE_URL}/admin/users/${id}`, {
+        method: 'DELETE'
+    }),
+    resetUserPassword: (id, newPassword) => authenticatedFetch(`${BASE_URL}/admin/users/${id}/reset-password`, {
+        method: 'PUT',
+        body: JSON.stringify({ newPassword })
+    })
 };
 
 // Logout function

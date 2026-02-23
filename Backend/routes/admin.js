@@ -41,4 +41,20 @@ router.delete('/questions/:id', adminController.deleteQuestion);
 // Xem lịch sử thi của toàn bộ hệ thống
 router.get('/exam-history', adminController.getAllExamHistory);
 
+// ==================== USERS (Quản lý người dùng) ====================
+// Lấy danh sách tất cả người dùng
+router.get('/users', adminController.getAllUsers);
+
+// Lấy thông tin một người dùng
+router.get('/users/:id', adminController.getUserById);
+
+// Cập nhật thông tin người dùng
+router.put('/users/:id', adminController.updateUser);
+
+// Xóa người dùng
+router.delete('/users/:id', adminController.deleteUser);
+
+// Reset mật khẩu người dùng
+router.put('/users/:id/reset-password', adminController.resetUserPassword);
+
 module.exports = router;

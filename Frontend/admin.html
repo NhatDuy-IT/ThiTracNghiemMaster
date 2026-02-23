@@ -6,7 +6,6 @@
     <title>ExamMaster - Quản trị</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
     <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
@@ -18,14 +17,18 @@
                         "background-dark": "#101922",
                     },
                     fontFamily: {
-                        "display": ["Inter", "sans-serif"]
+                        "display": ["Inter", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"]
                     },
                 },
             },
         }
     </script>
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
     </style>
 </head>
 <body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 antialiased">
@@ -35,7 +38,9 @@
             <div class="flex justify-between items-center h-16">
                 <div class="flex items-center gap-8">
                     <a class="flex items-center gap-2 text-primary" href="admin.html">
-                        <span class="material-symbols-outlined text-3xl font-bold">analytics</span>
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
                         <span class="text-slate-900 dark:text-white text-xl font-extrabold tracking-tight">ExamMaster</span>
                         <span class="ml-2 px-2 py-0.5 bg-primary text-white text-xs rounded-full">Admin</span>
                     </a>
@@ -57,6 +62,7 @@
         <div class="flex gap-4 mb-8 border-b border-slate-200 dark:border-slate-700">
             <button class="px-4 py-2 text-sm font-semibold text-primary border-b-2 border-primary" id="tabSubjects" onclick="showTab('subjects')">Quản lý Môn thi</button>
             <button class="px-4 py-2 text-sm font-semibold text-slate-500 hover:text-slate-700" id="tabQuestions" onclick="showTab('questions')">Quản lý Câu hỏi</button>
+            <button class="px-4 py-2 text-sm font-semibold text-slate-500 hover:text-slate-700" id="tabUsers" onclick="showTab('users')">Quản lý Người dùng</button>
             <button class="px-4 py-2 text-sm font-semibold text-slate-500 hover:text-slate-700" id="tabHistory" onclick="showTab('history')">Lịch sử thi</button>
         </div>
 
@@ -64,8 +70,10 @@
         <div id="subjectsTab">
             <div class="flex justify-between items-center mb-6">
                 <h2 class="text-2xl font-bold text-slate-900 dark:text-white">Quản lý Môn thi</h2>
-                <button class="bg-primary hover:bg-primary/90 text-white font-bold px-6 py-2.5 rounded-lg transition-all flex items-center gap-2" onclick="showSubjectModal()">
-                    <span class="material-symbols-outlined">add</span>
+                <button type="button" class="bg-primary hover:bg-primary/90 text-white font-bold px-6 py-2.5 rounded-lg transition-all flex items-center gap-2" onclick="showSubjectModal()">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                    </svg>
                     Thêm môn thi
                 </button>
             </div>
@@ -90,8 +98,10 @@
         <div id="questionsTab" class="hidden">
             <div class="flex justify-between items-center mb-6">
                 <h2 class="text-2xl font-bold text-slate-900 dark:text-white">Quản lý Câu hỏi</h2>
-                <button class="bg-primary hover:bg-primary/90 text-white font-bold px-6 py-2.5 rounded-lg transition-all flex items-center gap-2" onclick="showQuestionModal()">
-                    <span class="material-symbols-outlined">add</span>
+                <button type="button" class="bg-primary hover:bg-primary/90 text-white font-bold px-6 py-2.5 rounded-lg transition-all flex items-center gap-2" onclick="showQuestionModal()">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                    </svg>
                     Thêm câu hỏi
                 </button>
             </div>
@@ -114,6 +124,31 @@
                     </thead>
                     <tbody id="questionTableBody" class="divide-y divide-slate-200 dark:divide-slate-700">
                         <tr><td colspan="5" class="px-6 py-4 text-center text-slate-500">Đang tải...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Users Tab -->
+        <div id="usersTab" class="hidden">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-slate-900 dark:text-white">Quản lý Người dùng</h2>
+            </div>
+            <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+                <table class="w-full">
+                    <thead class="bg-slate-50 dark:bg-slate-700/50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase">ID</th>
+                            <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase">Tên đăng nhập</th>
+                            <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase">Họ tên</th>
+                            <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase">Email</th>
+                            <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase">Vai trò</th>
+                            <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase">Ngày tạo</th>
+                            <th class="px-6 py-3 text-right text-xs font-bold text-slate-500 uppercase">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userTableBody" class="divide-y divide-slate-200 dark:divide-slate-700">
+                        <tr><td colspan="7" class="px-6 py-4 text-center text-slate-500">Đang tải...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -171,33 +206,33 @@
                 <input type="hidden" id="questionId"/>
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Môn thi</label>
-                    <select id="questionSubjectId" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700" required></select>
+                    <select id="questionSubjectId" title="Chọn môn thi" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700" required></select>
                 </div>
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Nội dung câu hỏi</label>
-                    <textarea id="questionText" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700" rows="3" required></textarea>
+                    <textarea id="questionText" title="Nhập nội dung câu hỏi" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700" rows="3" required></textarea>
                 </div>
                 <div class="grid grid-cols-2 gap-4 mb-4">
                     <div>
                         <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Đáp án A</label>
-                        <input type="text" id="optionA" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700" required/>
+                        <input type="text" id="optionA" title="Nhập đáp án A" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700" required/>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Đáp án B</label>
-                        <input type="text" id="optionB" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700" required/>
+                        <input type="text" id="optionB" title="Nhập đáp án B" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700" required/>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Đáp án C</label>
-                        <input type="text" id="optionC" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700" required/>
+                        <input type="text" id="optionC" title="Nhập đáp án C" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700" required/>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Đáp án D</label>
-                        <input type="text" id="optionD" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700" required/>
+                        <input type="text" id="optionD" title="Nhập đáp án D" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700" required/>
                     </div>
                 </div>
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Đáp án đúng</label>
-                    <select id="correctAnswer" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700" required>
+                    <select id="correctAnswer" title="Chọn đáp án đúng" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700" required>
                         <option value="A">A</option>
                         <option value="B">B</option>
                         <option value="C">C</option>
@@ -212,7 +247,98 @@
         </div>
     </div>
 
+    <!-- User Edit Modal -->
+    <div id="userModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 w-full max-w-md mx-4">
+            <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-4">Chỉnh sửa người dùng</h3>
+            <form id="userForm" onsubmit="saveUser(event)">
+                <input type="hidden" id="userId"/>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Tên đăng nhập</label>
+                    <input type="text" id="userUsername" title="Tên đăng nhập" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-700" disabled/>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Họ tên</label>
+                    <input type="text" id="userFullName" title="Họ tên" placeholder="Nhập họ tên" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700"/>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Email</label>
+                    <input type="email" id="userEmail" title="Email" placeholder="Nhập email" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700"/>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Vai trò</label>
+                    <select id="userRole" title="Chọn vai trò" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700">
+                        <option value="User">Người dùng</option>
+                        <option value="Admin">Quản trị viên</option>
+                    </select>
+                </div>
+                <div class="flex gap-3 justify-end">
+                    <button type="button" class="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg" onclick="closeUserModal()">Hủy</button>
+                    <button type="submit" class="px-4 py-2 bg-primary text-white rounded-lg">Lưu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Reset Password Modal -->
+    <div id="resetPasswordModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 w-full max-w-md mx-4">
+            <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-4">Reset mật khẩu</h3>
+            <form id="resetPasswordForm" onsubmit="resetPassword(event)">
+                <input type="hidden" id="resetUserId"/>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Người dùng</label>
+                    <input type="text" id="resetUserName" title="Tên người dùng" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-700" disabled/>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Mật khẩu mới</label>
+                    <input type="password" id="newPassword" placeholder="Nhập mật khẩu mới (tối thiểu 6 ký tự)" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700" required minlength="6"/>
+                </div>
+                <div class="flex gap-3 justify-end">
+                    <button type="button" class="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg" onclick="closeResetPasswordModal()">Hủy</button>
+                    <button type="submit" class="px-4 py-2 bg-primary text-white rounded-lg">Reset</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Alert Modal -->
+    <div id="alertModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-md w-full transform transition-all scale-95 opacity-0" id="alertModalContent">
+            <div class="flex justify-center pt-8 pb-4" id="alertIcon"></div>
+            <div class="px-8 pb-6 text-center">
+                <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2" id="alertTitle">Thông báo</h3>
+                <p class="text-slate-600 dark:text-slate-400" id="alertMessage"></p>
+            </div>
+            <div class="px-8 pb-8">
+                <button type="button" onclick="closeAlert()" class="w-full px-6 py-3 bg-primary text-white rounded-xl font-medium hover:bg-primary/90 transition-colors shadow-lg shadow-primary/30">Đóng</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm Modal -->
+    <div id="confirmModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-md w-full transform transition-all scale-95 opacity-0" id="confirmModalContent">
+            <div class="flex justify-center pt-8 pb-4">
+                <div class="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center">
+                    <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="px-8 pb-6 text-center">
+                <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Xác nhận xóa</h3>
+                <p class="text-slate-600 dark:text-slate-400" id="confirmMessage"></p>
+            </div>
+            <div class="flex gap-3 px-8 pb-8">
+                <button type="button" onclick="closeConfirm()" class="flex-1 px-6 py-3 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 rounded-xl font-medium hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">Hủy</button>
+                <button type="button" onclick="confirmYes()" class="flex-1 px-6 py-3 bg-red-600 text-white rounded-xl font-medium hover:bg-red-700 transition-colors shadow-lg shadow-red-600/30">Xóa</button>
+            </div>
+        </div>
+    </div>
+
     <script src="js/api.js"></script>
+    <script src="js/modal.js"></script>
     <script>
         const user = JSON.parse(localStorage.getItem('user'));
         if (!user || user.role !== 'Admin') {
@@ -222,9 +348,10 @@
 
         let subjects = [];
         let questions = [];
+        let users = [];
 
         function showTab(tab) {
-            ['subjects', 'questions', 'history'].forEach(t => {
+            ['subjects', 'questions', 'users', 'history'].forEach(t => {
                 document.getElementById(t + 'Tab').classList.add('hidden');
                 document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1)).classList.remove('text-primary', 'border-b-2', 'border-primary');
                 document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1)).classList.add('text-slate-500');
@@ -235,6 +362,7 @@
             
             if (tab === 'subjects') loadSubjects();
             if (tab === 'questions') loadQuestions();
+            if (tab === 'users') loadUsers();
             if (tab === 'history') loadHistory();
         }
 
@@ -320,6 +448,129 @@
             }
         }
 
+        // ==================== USERS ====================
+        async function loadUsers() {
+            try {
+                const res = await adminAPI.getUsers();
+                users = await res.json();
+                const tbody = document.getElementById('userTableBody');
+                if (users.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-4 text-center text-slate-500">Chưa có người dùng nào</td></tr>';
+                    return;
+                }
+                tbody.innerHTML = users.map(u => `
+                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/50">
+                        <td class="px-6 py-4">${u.UserID}</td>
+                        <td class="px-6 py-4 font-medium">${u.Username}</td>
+                        <td class="px-6 py-4">${u.FullName || '-'}</td>
+                        <td class="px-6 py-4 text-slate-500">${u.Email || '-'}</td>
+                        <td class="px-6 py-4">
+                            <span class="px-2 py-1 text-xs font-semibold rounded-full ${u.Role === 'Admin' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' : 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'}">
+                                ${u.Role === 'Admin' ? 'Quản trị viên' : 'Người dùng'}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-slate-500">${new Date(u.CreatedAt).toLocaleDateString('vi-VN')}</td>
+                        <td class="px-6 py-4 text-right">
+                            <button type="button" class="text-primary hover:underline mr-3" onclick="editUser(${u.UserID})">Sửa</button>
+                            <button type="button" class="text-yellow-600 hover:underline mr-3" onclick="showResetPasswordModal(${u.UserID}, '${u.Username}')">Reset MK</button>
+                            <button type="button" class="text-red-500 hover:underline" onclick="deleteUser(${u.UserID})">Xóa</button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        function editUser(id) {
+            const user = users.find(u => u.UserID === id);
+            document.getElementById('userModal').classList.remove('hidden');
+            document.getElementById('userModal').classList.add('flex');
+            document.getElementById('userId').value = user.UserID;
+            document.getElementById('userUsername').value = user.Username;
+            document.getElementById('userFullName').value = user.FullName || '';
+            document.getElementById('userEmail').value = user.Email || '';
+            document.getElementById('userRole').value = user.Role;
+        }
+
+        function closeUserModal() {
+            document.getElementById('userModal').classList.add('hidden');
+            document.getElementById('userModal').classList.remove('flex');
+            document.getElementById('userForm').reset();
+        }
+
+        async function saveUser(e) {
+            e.preventDefault();
+            const id = document.getElementById('userId').value;
+            const data = {
+                fullName: document.getElementById('userFullName').value,
+                email: document.getElementById('userEmail').value,
+                role: document.getElementById('userRole').value
+            };
+            try {
+                const res = await adminAPI.updateUser(id, data);
+                if (res.ok) {
+                    closeUserModal();
+                    loadUsers();
+                    showAlert('Cập nhật người dùng thành công!', 'success');
+                } else {
+                    showAlert('Lỗi cập nhật dữ liệu', 'error');
+                }
+            } catch (e) {
+                showAlert('Lỗi kết nối', 'error');
+            }
+        }
+
+        async function deleteUser(id) {
+            const user = users.find(u => u.UserID === id);
+            showConfirm(`Bạn có chắc muốn xóa người dùng "${user.Username}" không? Tất cả lịch sử thi của người dùng này cũng sẽ bị xóa.`, async () => {
+                try {
+                    const res = await adminAPI.deleteUser(id);
+                    if (res.ok) {
+                        loadUsers();
+                        showAlert('Xóa người dùng thành công!', 'success');
+                    } else {
+                        const data = await res.json();
+                        showAlert(data.error || 'Lỗi xóa dữ liệu', 'error');
+                    }
+                } catch (e) {
+                    showAlert('Lỗi kết nối', 'error');
+                }
+            });
+        }
+
+        function showResetPasswordModal(id, username) {
+            document.getElementById('resetPasswordModal').classList.remove('hidden');
+            document.getElementById('resetPasswordModal').classList.add('flex');
+            document.getElementById('resetUserId').value = id;
+            document.getElementById('resetUserName').value = username;
+            document.getElementById('newPassword').value = '';
+        }
+
+        function closeResetPasswordModal() {
+            document.getElementById('resetPasswordModal').classList.add('hidden');
+            document.getElementById('resetPasswordModal').classList.remove('flex');
+            document.getElementById('resetPasswordForm').reset();
+        }
+
+        async function resetPassword(e) {
+            e.preventDefault();
+            const id = document.getElementById('resetUserId').value;
+            const newPassword = document.getElementById('newPassword').value;
+            try {
+                const res = await adminAPI.resetUserPassword(id, newPassword);
+                if (res.ok) {
+                    closeResetPasswordModal();
+                    showAlert('Reset mật khẩu thành công!', 'success');
+                } else {
+                    const data = await res.json();
+                    showAlert(data.error || 'Lỗi reset mật khẩu', 'error');
+                }
+            } catch (e) {
+                showAlert('Lỗi kết nối', 'error');
+            }
+        }
+
         function showSubjectModal(subject = null) {
             document.getElementById('subjectModal').classList.remove('hidden');
             document.getElementById('subjectModal').classList.add('flex');
@@ -351,11 +602,12 @@
                 if (res.ok) {
                     closeSubjectModal();
                     loadSubjects();
+                    showAlert('Lưu môn thi thành công!', 'success');
                 } else {
-                    alert('Lỗi lưu dữ liệu');
+                    showAlert('Lỗi lưu dữ liệu', 'error');
                 }
             } catch (e) {
-                alert('Lỗi kết nối');
+                showAlert('Lỗi kết nối', 'error');
             }
         }
 
@@ -365,14 +617,20 @@
         }
 
         async function deleteSubject(id) {
-            if (!confirm('Bạn có chắc muốn xóa môn thi này?')) return;
-            try {
-                const res = await adminAPI.deleteSubject(id);
-                if (res.ok) loadSubjects();
-                else alert('Lỗi xóa dữ liệu');
-            } catch (e) {
-                alert('Lỗi kết nối');
-            }
+            const subject = subjects.find(s => s.SubjectID === id);
+            showConfirm(`Bạn có chắc muốn xóa môn thi "${subject.SubjectName}" không?`, async () => {
+                try {
+                    const res = await adminAPI.deleteSubject(id);
+                    if (res.ok) {
+                        loadSubjects();
+                        showAlert('Xóa môn thi thành công!', 'success');
+                    } else {
+                        showAlert('Lỗi xóa dữ liệu', 'error');
+                    }
+                } catch (e) {
+                    showAlert('Lỗi kết nối', 'error');
+                }
+            });
         }
 
         function showQuestionModal(question = null) {
@@ -416,11 +674,12 @@
                 if (res.ok) {
                     closeQuestionModal();
                     loadQuestions();
+                    showAlert('Lưu câu hỏi thành công!', 'success');
                 } else {
-                    alert('Lỗi lưu dữ liệu');
+                    showAlert('Lỗi lưu dữ liệu', 'error');
                 }
             } catch (e) {
-                alert('Lỗi kết nối');
+                showAlert('Lỗi kết nối', 'error');
             }
         }
 
@@ -430,14 +689,19 @@
         }
 
         async function deleteQuestion(id) {
-            if (!confirm('Bạn có chắc muốn xóa câu hỏi này?')) return;
-            try {
-                const res = await adminAPI.deleteQuestion(id);
-                if (res.ok) loadQuestions();
-                else alert('Lỗi xóa dữ liệu');
-            } catch (e) {
-                alert('Lỗi kết nối');
-            }
+            showConfirm('Bạn có chắc muốn xóa câu hỏi này không?', async () => {
+                try {
+                    const res = await adminAPI.deleteQuestion(id);
+                    if (res.ok) {
+                        loadQuestions();
+                        showAlert('Xóa câu hỏi thành công!', 'success');
+                    } else {
+                        showAlert('Lỗi xóa dữ liệu', 'error');
+                    }
+                } catch (e) {
+                    showAlert('Lỗi kết nối', 'error');
+                }
+            });
         }
 
         function logout() {

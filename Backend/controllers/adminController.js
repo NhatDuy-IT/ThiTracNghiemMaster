@@ -329,6 +329,156 @@ const adminController = {
             console.error('Lỗi lấy lịch sử thi:', error);
             res.status(500).json({ error: 'Lỗi server' });
         }
+    },
+
+    // ==================== USERS (Quản lý người dùng) ====================
+
+    // Lấy danh sách tất cả người dùng
+    getAllUsers: async (req, res) => {
+        try {
+            const pool = await connectDB();
+            const result = await pool.request()
+                .query(`
+                    SELECT
+                        UserID,
+                        Username,
+                        FullName,
+                        Email,
+                        Role,
+                        CreatedAt
+                    FROM Users
+                    ORDER BY CreatedAt DESC
+                `);
+
+            res.json(result.recordset);
+        } catch (error) {
+            console.error('Lỗi lấy danh sách người dùng:', error);
+            res.status(500).json({ error: 'Lỗi server' });
+        }
+    },
+
+    // Lấy thông tin một người dùng
+    getUserById: async (req, res) => {
+        try {
+            const { id } = req.params;
+            const pool = await connectDB();
+            const result = await pool.request()
+                .input('id', sql.Int, id)
+                .query(`
+                    SELECT
+                        UserID,
+                        Username,
+                        FullName,
+                        Email,
+                        Role,
+                        CreatedAt
+                    FROM Users
+                    WHERE UserID = @id
+                `);
+
+            if (result.recordset.length === 0) {
+                return res.status(404).json({ error: 'Người dùng không tồn tại' });
+            }
+
+            res.json(result.recordset[0]);
+        } catch (error) {
+            console.error('Lỗi lấy thông tin người dùng:', error);
+            res.status(500).json({ error: 'Lỗi server' });
+        }
+    },
+
+    // Cập nhật thông tin người dùng
+    updateUser: async (req, res) => {
+        try {
+            const { id } = req.params;
+            const { fullName, email, role } = req.body;
+
+            const pool = await connectDB();
+            const result = await pool.request()
+                .input('id', sql.Int, id)
+                .input('fullName', sql.NVarChar, fullName)
+                .input('email', sql.NVarChar, email)
+                .input('role', sql.NVarChar, role)
+                .query(`
+                    UPDATE Users
+                    SET FullName = @fullName,
+                        Email = @email,
+                        Role = @role
+                    WHERE UserID = @id
+                `);
+
+            if (result.rowsAffected[0] === 0) {
+                return res.status(404).json({ error: 'Người dùng không tồn tại' });
+            }
+
+            res.json({ message: 'Cập nhật người dùng thành công' });
+        } catch (error) {
+            console.error('Lỗi cập nhật người dùng:', error);
+            res.status(500).json({ error: 'Lỗi server' });
+        }
+    },
+
+    // Xóa người dùng
+    deleteUser: async (req, res) => {
+        try {
+            const { id } = req.params;
+
+            // Không cho phép xóa chính mình
+            if (req.user.userId === parseInt(id)) {
+                return res.status(400).json({ error: 'Không thể xóa tài khoản của chính mình' });
+            }
+
+            const pool = await connectDB();
+
+            // Xóa lịch sử thi của user trước
+            await pool.request()
+                .input('id', sql.Int, id)
+                .query('DELETE FROM ExamHistory WHERE UserID = @id');
+
+            // Xóa user
+            const result = await pool.request()
+                .input('id', sql.Int, id)
+                .query('DELETE FROM Users WHERE UserID = @id');
+
+            if (result.rowsAffected[0] === 0) {
+                return res.status(404).json({ error: 'Người dùng không tồn tại' });
+            }
+
+            res.json({ message: 'Xóa người dùng thành công' });
+        } catch (error) {
+            console.error('Lỗi xóa người dùng:', error);
+            res.status(500).json({ error: 'Lỗi server' });
+        }
+    },
+
+    // Reset mật khẩu người dùng
+    resetUserPassword: async (req, res) => {
+        try {
+            const { id } = req.params;
+            const { newPassword } = req.body;
+
+            if (!newPassword || newPassword.length < 6) {
+                return res.status(400).json({ error: 'Mật khẩu phải có ít nhất 6 ký tự' });
+            }
+
+            const bcrypt = require('bcrypt');
+            const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+            const pool = await connectDB();
+            const result = await pool.request()
+                .input('id', sql.Int, id)
+                .input('password', sql.NVarChar, hashedPassword)
+                .query('UPDATE Users SET Password = @password WHERE UserID = @id');
+
+            if (result.rowsAffected[0] === 0) {
+                return res.status(404).json({ error: 'Người dùng không tồn tại' });
+            }
+
+            res.json({ message: 'Reset mật khẩu thành công' });
+        } catch (error) {
+            console.error('Lỗi reset mật khẩu:', error);
+            res.status(500).json({ error: 'Lỗi server' });
+        }
     }
 };
 

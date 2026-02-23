@@ -6,7 +6,6 @@
     <title>ExamMaster - Lịch sử thi</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
     <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
@@ -18,14 +17,18 @@
                         "background-dark": "#101922",
                     },
                     fontFamily: {
-                        "display": ["Inter", "sans-serif"]
+                        "display": ["Inter", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"]
                     },
                 },
             },
         }
     </script>
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
     </style>
 </head>
 <body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 antialiased">
@@ -35,7 +38,9 @@
             <div class="flex justify-between items-center h-16">
                 <div class="flex items-center gap-8">
                     <a class="flex items-center gap-2 text-primary" href="home.html">
-                        <span class="material-symbols-outlined text-3xl font-bold">analytics</span>
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
                         <span class="text-slate-900 dark:text-white text-xl font-extrabold tracking-tight">ExamMaster</span>
                     </a>
                     <nav class="hidden md:flex items-center gap-6">
@@ -63,7 +68,9 @@
             <div class="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700">
                 <div class="flex items-center gap-4">
                     <div class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
-                        <span class="material-symbols-outlined text-primary text-2xl">assignment</span>
+                        <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
                     </div>
                     <div>
                         <p class="text-sm text-slate-500">Tổng bài thi</p>
@@ -74,7 +81,9 @@
             <div class="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700">
                 <div class="flex items-center gap-4">
                     <div class="w-12 h-12 bg-green-500/10 rounded-xl flex items-center justify-center">
-                        <span class="material-symbols-outlined text-green-600 text-2xl">trending_up</span>
+                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                        </svg>
                     </div>
                     <div>
                         <p class="text-sm text-slate-500">Điểm trung bình</p>
@@ -85,7 +94,9 @@
             <div class="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700">
                 <div class="flex items-center gap-4">
                     <div class="w-12 h-12 bg-yellow-500/10 rounded-xl flex items-center justify-center">
-                        <span class="material-symbols-outlined text-yellow-600 text-2xl">emoji_events</span>
+                        <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
+                        </svg>
                     </div>
                     <div>
                         <p class="text-sm text-slate-500">Điểm cao nhất</p>
