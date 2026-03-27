@@ -62,7 +62,7 @@ const adminController = {
     // Thêm môn thi mới
     createSubject: async (req, res) => {
         try {
-            const { subjectName, description } = req.body;
+            const { subjectName, description, duration } = req.body;
 
             if (!subjectName) {
                 return res.status(400).json({ error: 'Tên môn thi là bắt buộc' });
@@ -72,9 +72,10 @@ const adminController = {
             const result = await pool.request()
                 .input('subjectName', sql.NVarChar, subjectName)
                 .input('description', sql.NVarChar, description || '')
+                .input('duration', sql.Int, duration || 45)
                 .query(`
-                    INSERT INTO Subjects (SubjectName, Description)
-                    VALUES (@subjectName, @description);
+                    INSERT INTO Subjects (SubjectName, Description, Duration)
+                    VALUES (@subjectName, @description, @duration);
                     SELECT SCOPE_IDENTITY() as SubjectID;
                 `);
 
@@ -94,16 +95,17 @@ const adminController = {
     updateSubject: async (req, res) => {
         try {
             const { id } = req.params;
-            const { subjectName, description } = req.body;
+            const { subjectName, description, duration } = req.body;
 
             const pool = await connectDB();
             const result = await pool.request()
                 .input('id', sql.Int, id)
                 .input('subjectName', sql.NVarChar, subjectName)
                 .input('description', sql.NVarChar, description || '')
+                .input('duration', sql.Int, duration || 45)
                 .query(`
-                    UPDATE Subjects 
-                    SET SubjectName = @subjectName, Description = @description
+                    UPDATE Subjects
+                    SET SubjectName = @subjectName, Description = @description, Duration = @duration
                     WHERE SubjectID = @id
                 `);
 

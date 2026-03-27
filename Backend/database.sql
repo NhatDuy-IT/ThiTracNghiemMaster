@@ -38,8 +38,16 @@ BEGIN
         SubjectID INT IDENTITY(1,1) PRIMARY KEY,
         SubjectName NVARCHAR(100) NOT NULL,
         Description NVARCHAR(500),
+        Duration INT DEFAULT 45, -- Thời gian làm bài (phút)
         CreatedAt DATETIME DEFAULT GETDATE()
     );
+END
+GO
+
+-- Thêm cột Duration cho bảng Subjects nếu chưa có
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('Subjects') AND name = 'Duration')
+BEGIN
+    ALTER TABLE Subjects ADD Duration INT DEFAULT 45;
 END
 GO
 
