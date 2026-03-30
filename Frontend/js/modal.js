@@ -1,6 +1,3 @@
-// Custom Modal System for ExamMaster
-
-// Show Alert Modal (thay thế alert())
 function showAlert(message, type = 'info') {
     const modal = document.getElementById('alertModal');
     const content = document.getElementById('alertModalContent');
@@ -8,10 +5,9 @@ function showAlert(message, type = 'info') {
     const title = document.getElementById('alertTitle');
     const messageEl = document.getElementById('alertMessage');
     
-    // Set content
+
     messageEl.textContent = message;
-    
-    // Set icon and title based on type
+    //set icon and title based on type
     if (type === 'success') {
         title.textContent = 'Thành công';
         icon.innerHTML = `

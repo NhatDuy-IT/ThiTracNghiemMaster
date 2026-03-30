@@ -5,19 +5,24 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>ExamMaster - Hồ sơ cá nhân</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
     <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
             theme: {
                 extend: {
                     colors: {
-                        "primary": "#137fec",
-                        "background-light": "#f6f7f8",
+                        primary: "#137fec",
+                        "primary-dark": "#0f67c0",
+                        "background-light": "#f3f7fb",
                         "background-dark": "#101922",
                     },
+                    boxShadow: {
+                        glow: "0 20px 45px rgba(19, 127, 236, 0.18)",
+                        soft: "0 12px 35px rgba(15, 23, 42, 0.08)"
+                    },
                     fontFamily: {
-                        "display": ["Inter", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"]
+                        display: ["Inter", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"]
                     },
                 },
             },
@@ -29,13 +34,35 @@
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
+
+        .profile-shell {
+            background:
+                radial-gradient(circle at top right, rgba(19, 127, 236, 0.15), transparent 24rem),
+                radial-gradient(circle at top left, rgba(59, 130, 246, 0.08), transparent 20rem);
+        }
+
+        .profile-card {
+            -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(12px);
+        }
+
+        .avatar-ring {
+            box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.92), 0 18px 40px rgba(19, 127, 236, 0.25);
+        }
+
+        .avatar-upload-button:hover .avatar-overlay {
+            opacity: 1;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+        }
     </style>
 </head>
 <body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 antialiased">
-    <!-- Navigation -->
-    <header class="sticky top-0 z-50 w-full bg-white/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+    <header class="sticky top-0 z-50 w-full bg-white/85 dark:bg-background-dark/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
+            <div class="flex justify-between items-center h-16 gap-4">
                 <div class="flex items-center gap-8">
                     <a class="flex items-center gap-2 text-primary" href="home.html">
                         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -49,153 +76,195 @@
                         <a class="text-sm font-medium text-primary" href="profile.html">Hồ sơ</a>
                     </nav>
                 </div>
-                <div class="flex items-center gap-4">
-                    <span class="text-sm font-medium text-slate-600 dark:text-slate-300" id="userName"></span>
+                <div class="flex items-center gap-3 sm:gap-4">
+                    <span class="hidden sm:inline text-sm font-medium text-slate-600 dark:text-slate-300" id="userName"></span>
                     <button class="text-sm font-bold text-slate-700 dark:text-slate-200 hover:text-primary px-4 py-2 transition-colors" onclick="logout()">Đăng xuất</button>
                 </div>
             </div>
         </div>
     </header>
 
-    <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <!-- Profile Header -->
-        <div class="bg-white dark:bg-slate-800 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700 mb-8">
-            <div class="h-32 bg-gradient-to-r from-primary to-blue-400"></div>
-            <div class="px-8 pb-8">
-                <div class="relative -mt-16 mb-6">
-                    <div class="w-24 h-24 bg-white dark:bg-slate-800 rounded-full p-1">
-                        <div class="w-full h-full bg-primary rounded-full flex items-center justify-center">
-                            <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                            </svg>
+    <main class="profile-shell min-h-[calc(100vh-64px)]">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+            <section class="profile-card relative bg-white/90 dark:bg-slate-800/90 rounded-[2rem] overflow-hidden border border-white/60 dark:border-slate-700/80 shadow-soft mb-8">
+                <div class="h-40 sm:h-48 bg-gradient-to-r from-primary via-sky-500 to-cyan-400"></div>
+                <div class="px-5 sm:px-8 lg:px-10 pb-8">
+                    <div class="relative -mt-16 sm:-mt-20 flex flex-col items-center text-center">
+                        <button type="button" class="avatar-upload-button group relative w-32 h-32 sm:w-36 sm:h-36 rounded-full avatar-ring overflow-hidden transition-transform duration-300 hover:scale-[1.02]" onclick="document.getElementById('avatarInput').click()" title="Đổi ảnh đại diện">
+                            <img id="avatarImage" class="w-full h-full object-cover bg-primary hidden" src="" alt="Ảnh đại diện">
+                            <div id="avatarPlaceholder" class="w-full h-full bg-gradient-to-br from-primary to-blue-500 flex items-center justify-center">
+                                <svg class="w-14 h-14 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                </svg>
+                            </div>
+                            <div class="avatar-overlay absolute inset-0 bg-slate-900/45 opacity-0 transition-opacity duration-300 flex flex-col items-center justify-center text-white">
+                                <svg class="w-7 h-7 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 16.5V18a3 3 0 003 3h12a3 3 0 003-3v-1.5M16 8l-4-4m0 0L8 8m4-4v12"/>
+                                </svg>
+                                <span class="text-xs font-semibold tracking-wide uppercase">Đổi avatar</span>
+                            </div>
+                        </button>
+                        <label for="avatarInput" class="sr-only">Chọn ảnh đại diện</label>
+                        <input type="file" id="avatarInput" class="hidden" accept="image/jpeg,image/jpg,image/png" title="Chọn ảnh đại diện" onchange="handleAvatarUpload(event)"/>
+
+                        <div class="mt-5">
+                            <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-[0.2em] bg-primary/10 text-primary mb-4" id="userRole">Người dùng</span>
+                            <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white" id="displayName">Tên người dùng</h1>
+                            <p class="mt-2 text-sm sm:text-base text-slate-500 dark:text-slate-300 font-medium" id="username">@username</p>
+                            <button type="button" class="mt-5 inline-flex items-center gap-2 rounded-full bg-slate-900 text-white px-5 py-3 text-sm font-semibold shadow-glow hover:bg-primary transition-all duration-300" onclick="document.getElementById('avatarInput').click()">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 16.5V18a3 3 0 003 3h12a3 3 0 003-3v-1.5M16 8l-4-4m0 0L8 8m4-4v12"/>
+                                </svg>
+                                Đổi ảnh đại diện
+                            </button>
+                            <p class="mt-3 text-xs text-slate-500 dark:text-slate-400">Hỗ trợ JPG, JPEG, PNG • Tối đa 2MB</p>
                         </div>
                     </div>
                 </div>
-                <div class="flex justify-between items-start">
-                    <div>
-                        <h1 class="text-2xl font-bold text-slate-900 dark:text-white" id="displayName">Tên người dùng</h1>
-                        <p class="text-slate-500" id="username">@username</p>
-                    </div>
-                    <span class="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium" id="userRole">User</span>
-                </div>
-            </div>
-        </div>
+            </section>
 
-        <!-- Stats Cards -->
-        <div class="grid grid-cols-3 gap-6 mb-8">
-            <div class="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700 text-center">
-                <svg class="w-8 h-8 text-primary mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                </svg>
-                <p class="text-3xl font-black text-slate-900 dark:text-white" id="totalExams">0</p>
-                <p class="text-sm text-slate-500">Bài thi đã làm</p>
-            </div>
-            <div class="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700 text-center">
-                <svg class="w-8 h-8 text-green-500 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
-                </svg>
-                <p class="text-3xl font-black text-slate-900 dark:text-white" id="avgScore">0</p>
-                <p class="text-sm text-slate-500">Điểm TB</p>
-            </div>
-            <div class="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700 text-center">
-                <svg class="w-8 h-8 text-yellow-500 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
-                </svg>
-                <p class="text-3xl font-black text-slate-900 dark:text-white" id="bestScore">0</p>
-                <p class="text-sm text-slate-500">Điểm cao nhất</p>
-            </div>
-        </div>
-
-        <!-- Profile Info -->
-        <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6 mb-8">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl font-bold text-slate-900 dark:text-white">Thông tin cá nhân</h2>
-                <button class="text-primary font-medium hover:underline" onclick="editProfile()">Chỉnh sửa</button>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <label class="block text-sm text-slate-500 mb-1">Họ và tên</label>
-                    <p class="font-medium text-slate-900 dark:text-white" id="fullName">Chưa cập nhật</p>
-                </div>
-                <div>
-                    <label class="block text-sm text-slate-500 mb-1">Email</label>
-                    <p class="font-medium text-slate-900 dark:text-white" id="email">Chưa cập nhật</p>
-                </div>
-                <div>
-                    <label class="block text-sm text-slate-500 mb-1">Ngày tham gia</label>
-                    <p class="font-medium text-slate-900 dark:text-white" id="createdAt">-</p>
-                </div>
-                <div>
-                    <label class="block text-sm text-slate-500 mb-1">Vai trò</label>
-                    <p class="font-medium text-slate-900 dark:text-white" id="role">User</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Actions -->
-        <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6">
-            <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-6">Cài đặt</h2>
-            <button type="button" class="w-full flex items-center justify-between p-4 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors" onclick="changePassword()">
-                <div class="flex items-center gap-3">
-                    <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+            <section class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-8">
+                <div class="stat-card bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700 text-center shadow-soft transition-transform duration-300">
+                    <svg class="w-8 h-8 text-primary mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                     </svg>
-                    <span class="font-medium text-slate-900 dark:text-white">Đổi mật khẩu</span>
+                    <p class="text-3xl font-black text-slate-900 dark:text-white" id="totalExams">0</p>
+                    <p class="text-sm text-slate-500">Bài thi đã làm</p>
                 </div>
-                <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                </svg>
-            </button>
+                <div class="stat-card bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700 text-center shadow-soft transition-transform duration-300">
+                    <svg class="w-8 h-8 text-emerald-500 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                    </svg>
+                    <p class="text-3xl font-black text-slate-900 dark:text-white" id="avgScore">0</p>
+                    <p class="text-sm text-slate-500">Điểm trung bình</p>
+                </div>
+                <div class="stat-card bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700 text-center shadow-soft transition-transform duration-300">
+                    <svg class="w-8 h-8 text-amber-500 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
+                    </svg>
+                    <p class="text-3xl font-black text-slate-900 dark:text-white" id="bestScore">0</p>
+                    <p class="text-sm text-slate-500">Điểm cao nhất</p>
+                </div>
+            </section>
+
+            <section class="grid grid-cols-1 xl:grid-cols-[1.1fr_0.9fr] gap-6">
+                <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 sm:p-7 shadow-soft">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+                        <div>
+                            <h2 class="text-xl font-bold text-slate-900 dark:text-white">Thông tin cá nhân</h2>
+                            <p class="text-sm text-slate-500 mt-1">Quản lý thông tin hiển thị trên tài khoản của bạn.</p>
+                        </div>
+                        <button class="inline-flex items-center justify-center rounded-full border border-primary/20 bg-primary/10 px-4 py-2.5 text-sm font-semibold text-primary hover:bg-primary hover:text-white transition-colors" onclick="editProfile()">Chỉnh sửa</button>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div class="rounded-2xl bg-slate-50 dark:bg-slate-900/40 p-4">
+                            <label class="block text-xs font-semibold uppercase tracking-[0.2em] text-slate-400 mb-2">Họ và tên</label>
+                            <p class="font-semibold text-slate-900 dark:text-white text-lg" id="fullName">Chưa cập nhật</p>
+                        </div>
+                        <div class="rounded-2xl bg-slate-50 dark:bg-slate-900/40 p-4">
+                            <label class="block text-xs font-semibold uppercase tracking-[0.2em] text-slate-400 mb-2">Email</label>
+                            <p class="font-semibold text-slate-900 dark:text-white text-lg break-all" id="email">Chưa cập nhật</p>
+                        </div>
+                        <div class="rounded-2xl bg-slate-50 dark:bg-slate-900/40 p-4">
+                            <label class="block text-xs font-semibold uppercase tracking-[0.2em] text-slate-400 mb-2">Ngày tham gia</label>
+                            <p class="font-semibold text-slate-900 dark:text-white text-lg" id="createdAt">-</p>
+                        </div>
+                        <div class="rounded-2xl bg-slate-50 dark:bg-slate-900/40 p-4">
+                            <label class="block text-xs font-semibold uppercase tracking-[0.2em] text-slate-400 mb-2">Vai trò</label>
+                            <p class="font-semibold text-slate-900 dark:text-white text-lg" id="role">Người dùng</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 sm:p-7 shadow-soft">
+                    <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Cài đặt tài khoản</h2>
+                    <p class="text-sm text-slate-500 mb-6">Bảo mật tài khoản và cập nhật ảnh đại diện nhanh chóng.</p>
+
+                    <div class="space-y-4">
+                        <button type="button" class="w-full flex items-center justify-between p-4 border border-slate-200 dark:border-slate-700 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-700/40 transition-colors" onclick="changePassword()">
+                            <div class="flex items-center gap-3 text-left">
+                                <div class="w-11 h-11 rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <span class="block font-semibold text-slate-900 dark:text-white">Đổi mật khẩu</span>
+                                    <span class="block text-sm text-slate-500">Cập nhật mật khẩu để tăng bảo mật tài khoản</span>
+                                </div>
+                            </div>
+                            <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </button>
+
+                        <button type="button" class="w-full flex items-center justify-between p-4 border border-slate-200 dark:border-slate-700 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-700/40 transition-colors" onclick="document.getElementById('avatarInput').click()">
+                            <div class="flex items-center gap-3 text-left">
+                                <div class="w-11 h-11 rounded-2xl bg-sky-100 text-sky-600 flex items-center justify-center dark:bg-sky-500/10 dark:text-sky-400">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 16.5V18a3 3 0 003 3h12a3 3 0 003-3v-1.5M16 8l-4-4m0 0L8 8m4-4v12"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <span class="block font-semibold text-slate-900 dark:text-white">Tải ảnh đại diện mới</span>
+                                    <span class="block text-sm text-slate-500">Cập nhật ngay sau khi tải lên thành công</span>
+                                </div>
+                            </div>
+                            <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </section>
         </div>
     </main>
 
-    <!-- Edit Profile Modal -->
-    <div id="editModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
-        <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 w-full max-w-md mx-4">
+    <div id="editModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 w-full max-w-md shadow-2xl">
             <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-4">Chỉnh sửa thông tin</h3>
             <form onsubmit="saveProfile(event)">
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Họ và tên</label>
-                    <input type="text" id="editFullName" placeholder="Nhập họ và tên" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700" required/>
+                    <input type="text" id="editFullName" placeholder="Nhập họ và tên" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700" required/>
                 </div>
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Email</label>
-                    <input type="email" id="editEmail" placeholder="Nhập địa chỉ email" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700"/>
+                    <input type="email" id="editEmail" placeholder="Nhập địa chỉ email" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700"/>
                 </div>
                 <div class="flex gap-3 justify-end">
-                    <button type="button" class="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg" onclick="closeEditModal()">Hủy</button>
-                    <button type="submit" class="px-4 py-2 bg-primary text-white rounded-lg">Lưu</button>
+                    <button type="button" class="px-4 py-2.5 border border-slate-300 dark:border-slate-600 rounded-xl" onclick="closeEditModal()">Hủy</button>
+                    <button type="submit" class="px-4 py-2.5 bg-primary text-white rounded-xl hover:bg-primary-dark transition-colors">Lưu</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Change Password Modal -->
-    <div id="passwordModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
-        <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 w-full max-w-md mx-4">
+    <div id="passwordModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 w-full max-w-md shadow-2xl">
             <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-4">Đổi mật khẩu</h3>
             <form onsubmit="savePassword(event)">
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Mật khẩu hiện tại</label>
-                    <input type="password" id="currentPassword" placeholder="Nhập mật khẩu hiện tại" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700" required/>
+                    <input type="password" id="currentPassword" placeholder="Nhập mật khẩu hiện tại" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700" required/>
                 </div>
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Mật khẩu mới</label>
-                    <input type="password" id="newPassword" placeholder="Nhập mật khẩu mới" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700" required/>
+                    <input type="password" id="newPassword" placeholder="Nhập mật khẩu mới" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700" required/>
                 </div>
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Nhập lại mật khẩu mới</label>
-                    <input type="password" id="confirmPassword" placeholder="Nhập lại mật khẩu mới" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700" required/>
+                    <input type="password" id="confirmPassword" placeholder="Nhập lại mật khẩu mới" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700" required/>
                 </div>
                 <div class="flex gap-3 justify-end">
-                    <button type="button" class="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg" onclick="closePasswordModal()">Hủy</button>
-                    <button type="submit" class="px-4 py-2 bg-primary text-white rounded-lg">Lưu</button>
+                    <button type="button" class="px-4 py-2.5 border border-slate-300 dark:border-slate-600 rounded-xl" onclick="closePasswordModal()">Hủy</button>
+                    <button type="submit" class="px-4 py-2.5 bg-primary text-white rounded-xl hover:bg-primary-dark transition-colors">Lưu</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Alert Modal -->
     <div id="alertModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
         <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-md w-full transform transition-all scale-95 opacity-0" id="alertModalContent">
             <div class="flex justify-center pt-8 pb-4" id="alertIcon"></div>
@@ -213,21 +282,63 @@
     <script src="js/modal.js"></script>
     <script>
         let user = JSON.parse(localStorage.getItem('user'));
-        
-        if (!user) {
+
+        if (!user || !localStorage.getItem('token')) {
             window.location.href = 'index.html';
         }
 
-        document.getElementById('userName').textContent = user.fullName || user.username;
-        document.getElementById('displayName').textContent = user.fullName || user.username;
-        document.getElementById('username').textContent = '@' + user.username;
-        document.getElementById('userRole').textContent = user.role === 'Admin' ? 'Quản trị viên' : 'Người dùng';
-        document.getElementById('fullName').textContent = user.fullName || 'Chưa cập nhật';
-        document.getElementById('email').textContent = user.email || 'Chưa cập nhật';
-        document.getElementById('role').textContent = user.role === 'Admin' ? 'Quản trị viên' : 'Người dùng';
-        document.getElementById('createdAt').textContent = user.createdAt ? new Date(user.createdAt).toLocaleDateString('vi-VN') : '-';
+        function getRoleLabel(role) {
+            return role === 'Admin' ? 'Quản trị viên' : 'Người dùng';
+        }
 
-        // Load statistics
+        function setAvatar(avatarPath) {
+            const avatarImage = document.getElementById('avatarImage');
+            const avatarPlaceholder = document.getElementById('avatarPlaceholder');
+
+            if (avatarPath) {
+                avatarImage.src = buildAssetUrl(avatarPath);
+                avatarImage.classList.remove('hidden');
+                avatarPlaceholder.classList.add('hidden');
+            } else {
+                avatarImage.src = '';
+                avatarImage.classList.add('hidden');
+                avatarPlaceholder.classList.remove('hidden');
+            }
+        }
+
+        function renderProfile(profileData) {
+            user = { ...user, ...profileData };
+            localStorage.setItem('user', JSON.stringify(user));
+
+            document.getElementById('userName').textContent = user.fullName || user.username || '';
+            document.getElementById('displayName').textContent = user.fullName || user.username || 'Người dùng';
+            document.getElementById('username').textContent = `@${user.username || ''}`;
+            document.getElementById('userRole').textContent = getRoleLabel(user.role);
+            document.getElementById('fullName').textContent = user.fullName || 'Chưa cập nhật';
+            document.getElementById('email').textContent = user.email || 'Chưa cập nhật';
+            document.getElementById('role').textContent = getRoleLabel(user.role);
+            document.getElementById('createdAt').textContent = user.createdAt ? new Date(user.createdAt).toLocaleDateString('vi-VN') : '-';
+
+            setAvatar(user.avatarPath);
+        }
+
+        async function loadProfile() {
+            try {
+                const response = await userAPI.getProfile();
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Không thể tải hồ sơ');
+                }
+
+                renderProfile(data);
+            } catch (error) {
+                console.error('Error loading profile:', error);
+                renderProfile(user || {});
+                showAlert('Không thể tải dữ liệu hồ sơ mới nhất', 'warning');
+            }
+        }
+
         async function loadStats() {
             try {
                 const response = await userAPI.getExamHistory();
@@ -236,7 +347,7 @@
                     const totalExams = history.length;
                     const avgScore = totalExams > 0 ? (history.reduce((sum, h) => sum + h.Score, 0) / totalExams).toFixed(1) : 0;
                     const bestScore = totalExams > 0 ? Math.max(...history.map(h => h.Score)) : 0;
-                    
+
                     document.getElementById('totalExams').textContent = totalExams;
                     document.getElementById('avgScore').textContent = avgScore;
                     document.getElementById('bestScore').textContent = bestScore;
@@ -260,21 +371,23 @@
 
         async function saveProfile(e) {
             e.preventDefault();
-            const fullName = document.getElementById('editFullName').value;
-            const email = document.getElementById('editEmail').value;
-            
+            const fullName = document.getElementById('editFullName').value.trim();
+            const email = document.getElementById('editEmail').value.trim();
+
             try {
                 const response = await userAPI.updateProfile({ fullName, email });
+                const data = await response.json();
+
                 if (response.ok) {
-                    user.fullName = fullName;
-                    user.email = email;
-                    localStorage.setItem('user', JSON.stringify(user));
+                    renderProfile({ ...user, fullName, email });
+                    closeEditModal();
                     showAlert('Cập nhật thông tin thành công!', 'success');
-                    setTimeout(() => location.reload(), 1500);
+                    await loadProfile();
                 } else {
-                    showAlert('Cập nhật thất bại', 'error');
+                    showAlert(data.error || 'Cập nhật thất bại', 'error');
                 }
             } catch (error) {
+                console.error('Error saving profile:', error);
                 showAlert('Lỗi kết nối', 'error');
             }
         }
@@ -311,6 +424,7 @@
             try {
                 const response = await userAPI.changePassword({ currentPassword, newPassword });
                 const data = await response.json();
+
                 if (response.ok) {
                     showAlert('Đổi mật khẩu thành công!', 'success');
                     closePasswordModal();
@@ -318,7 +432,56 @@
                     showAlert(data.error || 'Đổi mật khẩu thất bại', 'error');
                 }
             } catch (error) {
+                console.error('Error changing password:', error);
                 showAlert('Lỗi kết nối', 'error');
+            }
+        }
+
+        async function handleAvatarUpload(event) {
+            const file = event.target.files[0];
+
+            if (!file) return;
+
+            const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+            if (!validTypes.includes(file.type)) {
+                showAlert('Chỉ chấp nhận file JPG, JPEG hoặc PNG', 'error');
+                event.target.value = '';
+                return;
+            }
+
+            const maxSize = 2 * 1024 * 1024;
+            if (file.size > maxSize) {
+                showAlert('Kích thước file không vượt quá 2MB', 'error');
+                event.target.value = '';
+                return;
+            }
+
+            const uploadButtons = document.querySelectorAll('.avatar-upload-button, button[onclick*="avatarInput"]');
+            uploadButtons.forEach(button => {
+                button.disabled = true;
+                button.classList.add('opacity-60', 'pointer-events-none');
+            });
+
+            try {
+                const response = await userAPI.uploadAvatar(file);
+                const data = await response.json();
+
+                if (response.ok) {
+                    renderProfile({ ...user, avatarPath: data.avatarPath });
+                    showAlert('Cập nhật ảnh đại diện thành công!', 'success');
+                    await loadProfile();
+                } else {
+                    showAlert(data.error || 'Cập nhật ảnh đại diện thất bại', 'error');
+                }
+            } catch (error) {
+                console.error('Error uploading avatar:', error);
+                showAlert('Lỗi kết nối', 'error');
+            } finally {
+                uploadButtons.forEach(button => {
+                    button.disabled = false;
+                    button.classList.remove('opacity-60', 'pointer-events-none');
+                });
+                event.target.value = '';
             }
         }
 
@@ -328,6 +491,8 @@
             window.location.href = 'index.html';
         }
 
+        renderProfile(user || {});
+        loadProfile();
         loadStats();
     </script>
 </body>

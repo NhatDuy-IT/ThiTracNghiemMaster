@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { userController, verifyUser } = require('../controllers/userController');
+const { uploadAvatar } = require('../middleware/fileUpload');
 
 // Tất cả các route User đều cần xác thực
 router.use(verifyUser);
@@ -30,5 +31,8 @@ router.put('/profile', userController.updateProfile);
 
 // Đổi mật khẩu
 router.put('/change-password', userController.changePassword);
+
+// Upload avatar
+router.post('/upload-avatar', uploadAvatar, userController.uploadAvatar);
 
 module.exports = router;

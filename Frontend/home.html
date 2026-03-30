@@ -30,6 +30,12 @@
             -moz-osx-font-smoothing: grayscale;
         }
         .subject-card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
+        .subject-cover {
+            transition: transform 0.5s ease;
+        }
+        .subject-card:hover .subject-cover {
+            transform: scale(1.06);
+        }
     </style>
 </head>
 <body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 antialiased">
@@ -258,6 +264,19 @@
             'linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%)'
         ];
 
+        const subjectImages = {
+            'Kiểm thử Phần mềm (QA/QC)': 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&q=80',
+            'Kiến trúc Web Backend': 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=1200&q=80',
+            'Lập trình C# & ASP.NET Core': 'https://images.unsplash.com/photo-1515879218367-8466d910aaa4?auto=format&fit=crop&w=1200&q=80',
+            'Lập trình Java Cơ bản & OOP': 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=1200&q=80',
+            'Lập trình Node.js & Express': 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1200&q=80',
+            'Phát triển Di động với Flutter': 'https://images.unsplash.com/photo-1607252650355-f7fd0460ccdb?auto=format&fit=crop&w=1200&q=80'
+        };
+
+        function getSubjectImage(subjectName, index) {
+            return subjectImages[subjectName] || `https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1200&q=80&sig=${index + 1}`;
+        }
+
         // Load subjects
         async function loadSubjects() {
             try {
@@ -273,11 +292,15 @@
                 }
 
                 container.innerHTML = subjects.map((subject, index) => `
-                    <div class="group relative bg-slate-50 dark:bg-slate-800 rounded-2xl overflow-hidden cursor-pointer hover:shadow-xl transition-all" onclick="startExam(${subject.SubjectID}, '${subject.SubjectName}')">
+                    <div class="subject-card group relative bg-slate-50 dark:bg-slate-800 rounded-2xl overflow-hidden cursor-pointer hover:shadow-xl transition-all" onclick="startExam(${subject.SubjectID}, '${subject.SubjectName.replace(/'/g, "\\'")}')">
                         <div class="aspect-[4/3] relative overflow-hidden" style="background: ${gradients[index % gradients.length]}">
-                            <div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent"></div>
+                            <img class="subject-cover absolute inset-0 w-full h-full object-cover" src="${getSubjectImage(subject.SubjectName, index)}" alt="${subject.SubjectName}">
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-900/20 to-transparent"></div>
+                            <div class="absolute top-4 right-4 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-white text-xs font-semibold border border-white/20">
+                                Môn thi
+                            </div>
                             <div class="absolute bottom-4 left-4 right-4">
-                                <h5 class="text-xl font-bold text-white mb-1">${subject.SubjectName}</h5>
+                                <h5 class="text-xl font-bold text-white mb-1 drop-shadow-lg">${subject.SubjectName}</h5>
                             </div>
                         </div>
                         <div class="p-5">

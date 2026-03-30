@@ -23,17 +23,17 @@ BEGIN
         Password NVARCHAR(255) NOT NULL,
         FullName NVARCHAR(100),
         Email NVARCHAR(100),
-        Role NVARCHAR(20) CHECK (Role IN ('Admin', 'User')) DEFAULT 'User',
-        CreatedAt DATETIME DEFAULT GETDATE()
-    );
+        AvatarPath NVARCHAR(255),
+        Role NVARCHAR(20) CHECK (Role IN ('Admin', 'User')) DEFAULT 'User',
+        CreatedAt DATETIME DEFAULT GETDATE()
+    );
 END
 GO
 
--- =============================================
--- Bảng Subjects (Môn thi/Chủ đề)
--- =============================================
-IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'Subjects')
+-- Add AvatarPath column if it doesn't exist
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('Users') AND name = 'AvatarPath')
 BEGIN
+    ALTER TABLE Users ADD AvatarPath NVARCHAR(255);
     CREATE TABLE Subjects (
         SubjectID INT IDENTITY(1,1) PRIMARY KEY,
         SubjectName NVARCHAR(100) NOT NULL,
@@ -65,27 +65,11 @@ BEGIN
         OptionC NVARCHAR(500) NOT NULL,
         OptionD NVARCHAR(500) NOT NULL,
         CorrectAnswer CHAR(1) CHECK (CorrectAnswer IN ('A', 'B', 'C', 'D')) NOT NULL,
-        CreatedAt DATETIME DEFAULT GETDATE()
-    );
+        Explanation NVARCHAR(MAX),
+        CreatedAt DATETIME DEFAULT GETDATE()
+    );
 END
 GO
 
--- =============================================
--- Bảng ExamHistory (Lịch sử thi)
--- =============================================
-IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'ExamHistory')
-BEGIN
-    CREATE TABLE ExamHistory (
-        ExamID INT IDENTITY(1,1) PRIMARY KEY,
-        UserID INT FOREIGN KEY REFERENCES Users(UserID) ON DELETE CASCADE,
-        SubjectID INT FOREIGN KEY REFERENCES Subjects(SubjectID) ON DELETE CASCADE,
-        Score FLOAT NOT NULL,
-        TotalQuestions INT NOT NULL,
-        CorrectAnswers INT NOT NULL,
-        ExamDate DATETIME DEFAULT GETDATE()
-    );
-END
-GO
-
-PRINT N'✅ Tạo CSDL và các bảng hoàn tất!';
+PRINT N' Tạo CSDL và các bảng hoàn tất!';
 GO

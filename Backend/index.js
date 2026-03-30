@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const { connectDB } = require('./database');
 
 // Import Routes
@@ -13,6 +14,9 @@ const PORT = process.env.PORT || 3000;
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Serve static files (images)
+app.use('/api/images', express.static(path.join(__dirname, 'wwwroot/images')));
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -33,10 +37,10 @@ const startServer = async () => {
     try {
         await connectDB();
         app.listen(PORT, () => {
-            console.log(`🚀 Server đang chạy tại http://localhost:${PORT}`);
+            console.log(` Server đang chạy tại http://localhost:${PORT}`);
         });
     } catch (error) {
-        console.error('❌ Không thể khởi động server:', error.message);
+        console.error(' Không thể khởi động server:', error.message);
         process.exit(1);
     }
 };

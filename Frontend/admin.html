@@ -46,7 +46,6 @@
                     </a>
                     <nav class="hidden md:flex items-center gap-6">
                         <a class="text-sm font-medium text-primary" href="admin.html">Quản lý</a>
-                        <a class="text-sm font-medium text-slate-600 hover:text-primary dark:text-slate-300" href="history.html">Lịch sử thi</a>
                     </nav>
                 </div>
                 <div class="flex items-center gap-4">
@@ -85,6 +84,7 @@
                             <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase">Tên môn thi</th>
                             <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase">Mô tả</th>
                             <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase">Thời gian (phút)</th>
+                            <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase">Số câu hỏi</th>
                             <th class="px-6 py-3 text-right text-xs font-bold text-slate-500 uppercase">Thao tác</th>
                         </tr>
                     </thead>
@@ -99,12 +99,21 @@
         <div id="questionsTab" class="hidden">
             <div class="flex justify-between items-center mb-6">
                 <h2 class="text-2xl font-bold text-slate-900 dark:text-white">Quản lý Câu hỏi</h2>
-                <button type="button" class="bg-primary hover:bg-primary/90 text-white font-bold px-6 py-2.5 rounded-lg transition-all flex items-center gap-2" onclick="showQuestionModal()">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                    </svg>
-                    Thêm câu hỏi
-                </button>
+                <div class="flex gap-3">
+                    <button type="button" class="bg-primary hover:bg-primary/90 text-white font-bold px-6 py-2.5 rounded-lg transition-all flex items-center gap-2" onclick="showExcelImportModal()">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 9m0 0l-4 4m4-4l4 4"/>
+                        </svg>
+                        Nhập từ Excel
+                    </button>
+
+                    <button type="button" class="bg-primary hover:bg-primary/90 text-white font-bold px-6 py-2.5 rounded-lg transition-all flex items-center gap-2" onclick="showQuestionModal()">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                        </svg>
+                        Thêm câu hỏi
+                    </button>
+                </div>
             </div>
             <div class="mb-4">
                 <label for="filterSubject" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Lọc theo môn thi</label>
@@ -308,6 +317,73 @@
         </div>
     </div>
 
+    <!-- Excel Import Modal -->
+    <div id="excelImportModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+            <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-4">Nhập câu hỏi từ Excel</h3>
+            
+            <!-- Drop Zone -->
+            <div class="mb-6 p-8 border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-lg text-center hover:border-primary hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors cursor-pointer" 
+                 ondrop="handleExcelDrop(event)" 
+                 ondragover="handleExcelDragOver(event)"
+                 ondragleave="handleExcelDragLeave(event)"
+                 onclick="document.getElementById('excelFileInput').click()">
+                <svg class="w-12 h-12 text-slate-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                </svg>
+                <p class="text-slate-900 dark:text-white font-medium mb-1">Kéo thả file Excel tại đây hoặc nhấp để chọn</p>
+                <p class="text-sm text-slate-500">Chỉ chấp nhận file .xlsx hoặc .xls (tối đa 5MB)</p>
+            </div>
+
+            <!-- Hidden file input -->
+            <input type="file" id="excelFileInput" class="hidden" title="Chọn file Excel để nhập câu hỏi" accept=".xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel" onchange="handleExcelFileSelect(event)"/>
+
+            <!-- Results Summary -->
+            <div id="excelResultsSummary" class="hidden">
+                <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-4">
+                    <div class="grid grid-cols-3 gap-4 text-center">
+                        <div>
+                            <p class="text-sm text-slate-600 dark:text-slate-400">Tổng dòng</p>
+                            <p class="text-2xl font-bold text-primary" id="totalRows">0</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-slate-600 dark:text-slate-400">Nhập thành công</p>
+                            <p class="text-2xl font-bold text-green-600" id="successRows">0</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-slate-600 dark:text-slate-400">Lỗi</p>
+                            <p class="text-2xl font-bold text-red-600" id="failedRows">0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Error List -->
+                <div id="errorsList" class="hidden mb-4 max-h-48 overflow-y-auto">
+                    <h4 class="font-semibold text-slate-900 dark:text-white mb-2">Lỗi chi tiết:</h4>
+                    <div id="errorItems" class="space-y-2"></div>
+                </div>
+            </div>
+
+            <!-- Loading Indicator -->
+            <div id="excelLoadingIndicator" class="hidden mb-4">
+                <div class="flex items-center gap-2">
+                    <div class="animate-spin">
+                        <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 1v6m4-2l-4-4-4 4M3 12h6m-2 4l4 4 4-4m9-8v6m.828-2l2.829-2.829-2.829 2.829z"/>
+                        </svg>
+                    </div>
+                    <span class="text-slate-600 dark:text-slate-400">Đang xử lý file...</span>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="flex gap-3 justify-end">
+                <button type="button" class="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg" onclick="closeExcelImportModal()">Đóng</button>
+                <button type="button" id="excelImportConfirmBtn" class="hidden px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90" onclick="confirmExcelImport()">Nhập dữ liệu</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Alert Modal -->
     <div id="alertModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
         <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-md w-full transform transition-all scale-95 opacity-0" id="alertModalContent">
@@ -372,13 +448,14 @@
             if (tab === 'history') loadHistory();
         }
 
-        async function loadSubjects() {
+async function loadSubjects() {
             try {
+                console.log('Loading subjects...');
                 const res = await adminAPI.getSubjects();
                 subjects = await res.json();
                 const tbody = document.getElementById('subjectTableBody');
                 if (subjects.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center text-slate-500">Chưa có môn thi nào</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-slate-500">Chưa có môn thi nào</td></tr>';
                     return;
                 }
                 tbody.innerHTML = subjects.map(s => `
@@ -394,6 +471,7 @@
                                 ${s.Duration || 45} phút
                             </span>
                         </td>
+                        <td class="px-6 py-4 text-slate-600 dark:text-slate-400">${s.TotalQuestions}</td>
                         <td class="px-6 py-4 text-right">
                             <button class="text-primary hover:underline mr-3" onclick="editSubject(${s.SubjectID})">Sửa</button>
                             <button class="text-red-500 hover:underline" onclick="deleteSubject(${s.SubjectID})">Xóa</button>
@@ -600,9 +678,10 @@
             document.getElementById('subjectModal').classList.remove('flex');
         }
 
-        async function saveSubject(e) {
+async function saveSubject(e) {
             e.preventDefault();
             const id = document.getElementById('subjectId').value;
+            console.log('Saving subject:', id ? 'update' : 'create');
             const data = {
                 subjectName: document.getElementById('subjectName').value,
                 description: document.getElementById('subjectDesc').value,
@@ -617,8 +696,8 @@
                 }
                 if (res.ok) {
                     closeSubjectModal();
-                    loadSubjects();
-                    showAlert('Lưu môn thi thành công!', 'success');
+                    loadSubjects(); // Tải lại danh sách môn học
+                    showAlert(id ? 'Cập nhật môn thi thành công!' : 'Thêm môn thi thành công!', 'success');
                 } else {
                     showAlert('Lỗi lưu dữ liệu', 'error');
                 }
@@ -724,6 +803,185 @@
             localStorage.removeItem('token');
             localStorage.removeItem('user');
             window.location.href = 'index.html';
+        }
+
+        // Excel Import Functions
+        let excelData = null;
+
+        function showExcelImportModal() {
+            document.getElementById('excelImportModal').classList.remove('hidden');
+            document.getElementById('excelImportModal').classList.add('flex');
+            document.getElementById('excelFileInput').value = '';
+            document.getElementById('excelResultsSummary').classList.add('hidden');
+            document.getElementById('excelLoadingIndicator').classList.add('hidden');
+            document.getElementById('excelImportConfirmBtn').classList.add('hidden');
+            excelData = null;
+        }
+
+        function closeExcelImportModal() {
+            document.getElementById('excelImportModal').classList.add('hidden');
+            document.getElementById('excelImportModal').classList.remove('flex');
+            excelData = null;
+        }
+
+        function handleExcelDragOver(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.currentTarget.classList.add('border-primary', 'bg-slate-50');
+        }
+
+        function handleExcelDragLeave(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.currentTarget.classList.remove('border-primary', 'bg-slate-50');
+        }
+
+        function handleExcelDrop(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.currentTarget.classList.remove('border-primary', 'bg-slate-50');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                document.getElementById('excelFileInput').files = files;
+                handleExcelFileSelect({ target: document.getElementById('excelFileInput') });
+            }
+        }
+
+        async function handleExcelFileSelect(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            // Validate file type
+            const validTypes = ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel'];
+            if (!validTypes.includes(file.type)) {
+                showAlert('Chỉ chấp nhận file Excel (.xlsx hoặc .xls)', 'error');
+                return;
+            }
+
+            // Validate file size (5MB max)
+            const maxSize = 5 * 1024 * 1024;
+            if (file.size > maxSize) {
+                showAlert('Kích thước file không vượt quá 5MB', 'error');
+                return;
+            }
+
+            try {
+                document.getElementById('excelLoadingIndicator').classList.remove('hidden');
+
+                const response = await adminAPI.importQuestions(file);
+                const data = await response.json();
+
+                document.getElementById('excelLoadingIndicator').classList.add('hidden');
+
+                if (response.ok) {
+                    excelData = data;
+                    displayExcelResults(data);
+                } else {
+                    showAlert(data.message || 'Lỗi xử lý file', 'error');
+                }
+            } catch (error) {
+                console.error('Error processing Excel:', error);
+                document.getElementById('excelLoadingIndicator').classList.add('hidden');
+                showAlert('Lỗi kết nối',  'error');
+            }
+        }
+
+        function displayExcelResults(data) {
+            const totalRows = data.summary.total;
+            const successRows = data.summary.imported;
+            const failedRows = data.summary.failed + data.summary.databaseErrors;
+
+            document.getElementById('totalRows').textContent = totalRows;
+            document.getElementById('successRows').textContent = successRows;
+            document.getElementById('failedRows').textContent = failedRows;
+
+            // Show results summary
+            document.getElementById('excelResultsSummary').classList.remove('hidden');
+
+            // Show errors if any
+            if (data.parseErrors.length > 0 || data.databaseErrors.length > 0) {
+                const errorsList = document.getElementById('errorsList');
+                const errorItems = document.getElementById('errorItems');
+                errorItems.innerHTML = '';
+
+                // Parse errors
+                data.parseErrors.forEach(error => {
+                    if (error.row !== undefined) {
+                        const div = document.createElement('div');
+                        div.className = 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-2 rounded text-sm';
+                        div.innerHTML = `<strong>Dòng ${error.row}:</strong> ${error.errors.join(', ')}`;
+                        errorItems.appendChild(div);
+                    }
+                });
+
+                // Database errors
+                data.databaseErrors.forEach(error => {
+                    const div = document.createElement('div');
+                    div.className = 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-2 rounded text-sm';
+                    div.innerHTML = `<strong>Lỗi DB:</strong> ${error.question} - ${error.error}`;
+                    errorItems.appendChild(div);
+                });
+
+                errorsList.classList.remove('hidden');
+            } else {
+                document.getElementById('errorsList').classList.add('hidden');
+            }
+
+            // Show confirmation button
+            if (successRows > 0) {
+                document.getElementById('excelImportConfirmBtn').classList.remove('hidden');
+            }
+        }
+
+        async function confirmExcelImport() {
+            if (!excelData || excelData.summary.imported === 0) {
+                showAlert('Không có dữ liệu để nhập', 'error');
+                return;
+            }
+
+            try {
+                // Show loading
+                const confirmBtn = document.getElementById('excelImportConfirmBtn');
+                confirmBtn.disabled = true;
+                confirmBtn.textContent = 'Đang nhập...';
+
+                // The import should have been done already by the backend
+                showAlert(`Nhập thành công ${excelData.summary.imported} câu hỏi!`, 'success');
+                
+                closeExcelImportModal();
+                loadQuestions(); // Reload the questions table
+
+                confirmBtn.disabled = false;
+                confirmBtn.textContent = 'Nhập dữ liệu';
+            } catch (error) {
+                console.error('Error confirming import:', error);
+                showAlert('Lỗi kết nối', 'error');
+                document.getElementById('excelImportConfirmBtn').disabled = false;
+            }
+        }
+
+        async function downloadTemplate() {
+            try {
+                const response = await adminAPI.downloadTemplate();
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'QuestionTemplate.xlsx';
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                    showAlert('Tải mẫu thành công!', 'success');
+                } else {
+                    showAlert('Tải mẫu thất bại', 'error');
+                }
+            } catch (error) {
+                console.error('Error downloading template:', error);
+                showAlert('Lỗi kết nối', 'error');
+            }
         }
 
         loadSubjects();

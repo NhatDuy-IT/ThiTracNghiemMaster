@@ -2,7 +2,7 @@
 const sql = require('mssql/msnodesqlv8');
 
 const config = {
-    server: 'MSI\\SQLEXPRESS01',
+    server: '(localdb)\\mssqllocaldb',
     database: 'TracNghiemWebSite',
     driver: 'msnodesqlv8',
     options: {
@@ -15,10 +15,10 @@ const config = {
 const connectDB = async () => {
     try {
         let pool = await sql.connect(config);
-        console.log('✅ Kết nối SQL Server thành công (Windows Authentication)');
+        console.log('Kết nối SQL Server thành công (Windows Authentication)');
         return pool;
     } catch (err) {
-        console.error('❌ Lỗi kết nối SQL Server:', err.message);
+        console.error('Lỗi kết nối SQL Server:', err.message);
         process.exit(1);
     }
 };

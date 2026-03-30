@@ -1,6 +1,8 @@
 const { sql, connectDB } = require('../database');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const path = require('path');
+const fs = require('fs');
 
 const JWT_SECRET = 'your-secret-key-change-in-production';
 
@@ -21,7 +23,7 @@ const verifyUser = async (req, res, next) => {
 };
 
 const userController = {
-    // ==================== SUBJECTS (Môn thi) ====================
+    // ==================== MÔN THI ====================
 
     // Lấy danh sách môn thi (User có thể xem)
     getAllSubjects: async (req, res) => {
@@ -37,7 +39,7 @@ const userController = {
         }
     },
 
-    // ==================== QUESTIONS (Câu hỏi) ====================
+    // ==================== CÂU HỎI ====================
 
     // Lấy danh sách câu hỏi theo môn thi
     getQuestionsBySubject: async (req, res) => {
@@ -54,7 +56,7 @@ const userController = {
             let query = 'SELECT QuestionID, QuestionText, OptionA, OptionB, OptionC, OptionD FROM Questions WHERE SubjectID = @subjectId';
             
             if (limit) {
-                query += ` ORDER BY NEWID()`; // Random order
+                query += ` ORDER BY NEWID()`; // Thứ tự ngẫu nhiên
                 query = `SELECT TOP ${limit} * FROM (${query}) as Questions`;
             } else {
                 query += ' ORDER BY QuestionID';
@@ -187,7 +189,7 @@ const userController = {
 
             const result = await pool.request()
                 .input('userId', sql.Int, userId)
-                .query('SELECT UserID, Username, FullName, Email, Role, CreatedAt FROM Users WHERE UserID = @userId');
+                .query('SELECT UserID, Username, FullName, Email, AvatarPath, Role, CreatedAt FROM Users WHERE UserID = @userId');
 
             if (result.recordset.length === 0) {
                 return res.status(404).json({ error: 'Không tìm thấy người dùng' });
@@ -259,6 +261,52 @@ const userController = {
             res.json({ message: 'Đổi mật khẩu thành công' });
         } catch (error) {
             console.error('Lỗi đổi mật khẩu:', error);
+            res.status(500).json({ error: 'Lỗi server' });
+        }
+    },
+
+    // Upload Avatar
+    uploadAvatar: async (req, res) => {
+        try {
+            const userId = req.user.userId;
+
+            if (!req.file) {
+                return res.status(400).json({ error: 'Chưa chọn file' });
+            }
+
+            const pool = await connectDB();
+
+            // Get old avatar path to delete
+            const userResult = await pool.request()
+                .input('userId', sql.Int, userId)
+                .query('SELECT AvatarPath FROM Users WHERE UserID = @userId');
+
+            if (userResult.recordset.length === 0) {
+                return res.status(404).json({ error: 'Không tìm thấy người dùng' });
+            }
+
+            // Delete old avatar if exists
+            if (userResult.recordset[0].AvatarPath) {
+                const oldPath = path.join(__dirname, '../wwwroot/images/avatars', path.basename(userResult.recordset[0].AvatarPath));
+                if (fs.existsSync(oldPath)) {
+                    fs.unlinkSync(oldPath);
+                }
+            }
+
+            // Save new avatar path
+            const avatarPath = `/api/images/avatars/${req.file.filename}`;
+
+            await pool.request()
+                .input('userId', sql.Int, userId)
+                .input('avatarPath', sql.NVarChar(255), avatarPath)
+                .query('UPDATE Users SET AvatarPath = @avatarPath WHERE UserID = @userId');
+
+            res.json({
+                message: 'Cập nhật ảnh đại diện thành công',
+                avatarPath: avatarPath
+            });
+        } catch (error) {
+            console.error('Lỗi upload avatar:', error);
             res.status(500).json({ error: 'Lỗi server' });
         }
     }

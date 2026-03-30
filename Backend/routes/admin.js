@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { adminController, verifyAdmin } = require('../controllers/adminController');
+const { uploadExcel } = require('../middleware/fileUpload');
 
 // Tất cả các route Admin đều cần xác thực
 router.use(verifyAdmin);
@@ -56,5 +57,12 @@ router.delete('/users/:id', adminController.deleteUser);
 
 // Reset mật khẩu người dùng
 router.put('/users/:id/reset-password', adminController.resetUserPassword);
+
+// ==================== EXCEL IMPORT (Nhập câu hỏi từ Excel) ====================
+// Download template
+router.get('/download-template', adminController.downloadTemplate);
+
+// Import questions from Excel
+router.post('/import-questions', uploadExcel, adminController.importQuestions);
 
 module.exports = router;

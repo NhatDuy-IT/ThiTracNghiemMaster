@@ -1,7 +1,14 @@
-// API Configuration
+// Cấu hình API
 const BASE_URL = 'http://localhost:3000/api';
+const API_ORIGIN = BASE_URL.replace(/\/api$/, '');
 
-// Helper function for API calls with authentication
+function buildAssetUrl(assetPath) {
+    if (!assetPath) return '';
+    if (/^https?:\/\//i.test(assetPath)) return assetPath;
+    return `${API_ORIGIN}${assetPath.startsWith('/') ? assetPath : `/${assetPath}`}`;
+}
+
+// Hàm hỗ trợ gọi API với xác thực
 async function authenticatedFetch(url, options = {}) {
     const token = localStorage.getItem('token');
     
@@ -16,7 +23,7 @@ async function authenticatedFetch(url, options = {}) {
 
     const response = await fetch(url, config);
     
-    // Handle token expiration
+    // Xử lý token hết hạn
     if (response.status === 401) {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
@@ -27,7 +34,7 @@ async function authenticatedFetch(url, options = {}) {
     return response;
 }
 
-// Auth API
+// API Xác thực
 const authAPI = {
     login: (username, password) => 
         fetch(`${BASE_URL}/auth/login`, {
@@ -44,7 +51,7 @@ const authAPI = {
         })
 };
 
-// User API
+// API Người dùng
 const userAPI = {
     getSubjects: () => authenticatedFetch(`${BASE_URL}/user/subjects`),
     
@@ -56,6 +63,19 @@ const userAPI = {
     }),
     
     getExamHistory: () => authenticatedFetch(`${BASE_URL}/user/exam-history`),
+
+    getSavedExams: () => authenticatedFetch(`${BASE_URL}/user/saved-exams`),
+
+    getSavedExam: (subjectId) => authenticatedFetch(`${BASE_URL}/user/saved-exams/${subjectId}`),
+
+    saveExamDraft: (data) => authenticatedFetch(`${BASE_URL}/user/saved-exams`, {
+        method: 'POST',
+        body: JSON.stringify(data)
+    }),
+
+    deleteSavedExam: (subjectId) => authenticatedFetch(`${BASE_URL}/user/saved-exams/${subjectId}`, {
+        method: 'DELETE'
+    }),
     
     // Profile
     getProfile: () => authenticatedFetch(`${BASE_URL}/user/profile`),
@@ -68,10 +88,33 @@ const userAPI = {
     changePassword: (data) => authenticatedFetch(`${BASE_URL}/user/change-password`, {
         method: 'PUT',
         body: JSON.stringify(data)
-    })
+    }),
+
+    // Avatar upload
+    uploadAvatar: (file) => {
+        const token = localStorage.getItem('token');
+        const formData = new FormData();
+        formData.append('avatar', file);
+
+        return fetch(`${BASE_URL}/user/upload-avatar`, {
+            method: 'POST',
+            headers: {
+                ...(token && { 'Authorization': `Bearer ${token}` })
+            },
+            body: formData
+        }).then(response => {
+            if (response.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                window.location.href = 'index.html';
+                throw new Error('Token expired');
+            }
+            return response;
+        });
+    }
 };
 
-// Admin API
+// API Admin
 const adminAPI = {
     // Subjects
     getSubjects: () => authenticatedFetch(`${BASE_URL}/admin/subjects`),
@@ -122,7 +165,48 @@ const adminAPI = {
     resetUserPassword: (id, newPassword) => authenticatedFetch(`${BASE_URL}/admin/users/${id}/reset-password`, {
         method: 'PUT',
         body: JSON.stringify({ newPassword })
-    })
+    }),
+
+    // Excel Import
+    downloadTemplate: () => {
+        const token = localStorage.getItem('token');
+        return fetch(`${BASE_URL}/admin/download-template`, {
+            method: 'GET',
+            headers: {
+                ...(token && { 'Authorization': `Bearer ${token}` })
+            }
+        }).then(response => {
+            if (response.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                window.location.href = 'index.html';
+                throw new Error('Token expired');
+            }
+            return response;
+        });
+    },
+
+    importQuestions: (file) => {
+        const token = localStorage.getItem('token');
+        const formData = new FormData();
+        formData.append('excelFile', file);
+
+        return fetch(`${BASE_URL}/admin/import-questions`, {
+            method: 'POST',
+            headers: {
+                ...(token && { 'Authorization': `Bearer ${token}` })
+            },
+            body: formData
+        }).then(response => {
+            if (response.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                window.location.href = 'index.html';
+                throw new Error('Token expired');
+            }
+            return response;
+        });
+    }
 };
 
 // Logout function
