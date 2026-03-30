@@ -2,7 +2,7 @@
 const sql = require('mssql/msnodesqlv8');
 
 const config = {
-    server: '(localdb)\\mssqllocaldb',
+    server: 'MSI\\SQLEXPRESS01',
     database: 'TracNghiemWebSite',
     driver: 'msnodesqlv8',
     options: {
