@@ -2,7 +2,7 @@
 const sql = require('mssql/msnodesqlv8');
 
 const config = {
-    server: 'MSI\\SQLEXPRESS01',
+    server: 'MSI\\SQLEXPRESS01', // Lưu ý: Phải dùng 2 dấu gạch chéo ngược (\\)
     database: 'TracNghiemWebSite',
     driver: 'msnodesqlv8',
     options: {

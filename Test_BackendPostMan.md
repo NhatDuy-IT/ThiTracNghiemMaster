@@ -11,7 +11,6 @@
   "email": "student01@gmail.com"
 }
 ```
-**Response thành công:**
 ```json
 {
   "message": "Đăng ký thành công!",
