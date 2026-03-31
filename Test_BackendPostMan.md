@@ -1,214 +1,120 @@
-### 1. **Đăng ký tài khoản mới**
-- **Method**: `POST`
-- **URL**: `http://localhost:3000/api/auth/register`
-- **Headers**: `Content-Type: application/json`
-- **Body** (JSON):
-```json
-{
-  "username": "student01",
-  "password": "123456",
-  "fullName": "Nguyễn Văn A",
-  "email": "student01@gmail.com"
-}
-```
-```json
-{
-  "message": "Đăng ký thành công!",
-  "user": {
-    "UserID": 1,
-    "Username": "student01",
-    "FullName": "Nguyễn Văn A",
-    "Email": "student01@gmail.com",
-    "Role": "User"
-  }
-}
-```
+# 🚀 HƯỚNG DẪN TEST API EXAMMASTER (DÀNH CHO NGÀY BÁO CÁO)
+
+Tài liệu này được thiết kế để bạn có thể thực hiện kiểm thử từng bước (step-by-step) một cách mượt mà nhất trong buổi báo cáo đồ án.
+
+--
+
+## 🛠️ CHUẨN BỊ CHUNG
+- **Base URL**: `http://localhost:3000/api`
+- **Headers mật định**: `Content-Type: application/json`
+- **Biến môi trường**: Nên tạo một biến `token` trong Postman để dán mã JWT vào sau khi đăng nhập.
+
 ---
 
-### 2. **Đăng nhập**
+## 🕒 GIAI ĐOẠN 1: XÁC THỰC (AUTHENTICATION)
+*Đây là bước đầu tiên để chứng minh hệ thống quản lý tài khoản tốt.*
+
+### 1. Đăng ký tài khoản (Học sinh mới)
 - **Method**: `POST`
-- **URL**: `http://localhost:3000/api/auth/login`
+- **URL**: `{{baseUrl}}/auth/register`
+- **Mục tiêu**: Tạo một học sinh mới để bắt đầu thi.
 - **Body**:
 ```json
 {
-  "username": "student01",
-  "password": "123456"
+  "username": "student_test",
+  "password": "123",
+  "fullName": "Nguyễn Văn Test",
+  "email": "test@gmail.com"
 }
 ```
 
-**Response:**
+### 2. Đăng nhập (Lấy mã Token)
+- **Method**: `POST`
+- **URL**: `{{baseUrl}}/auth/login`
+- **Mục tiêu**: Lấy mã `token` để dùng cho tất cả các bước sau.
+- **Body**:
 ```json
 {
-  "message": "Đăng nhập thành công!",
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "user": {
-    "UserID": 1,
-    "Username": "student01",
-    "FullName": "Nguyễn Văn A",
-    "Role": "User"
-  }
+  "username": "student_test",
+  "password": "123"
 }
 ```
----
+> [!TIP]
+> **Quan trọng**: Sau khi nhấn Send, hãy Copy chuỗi `token` trong kết quả trả về và dán vào phần **Authorization -> Bearer Token** của các API tiếp theo.
 
-##  B. USER API (`/api/user`) - Dành cho học sinh
-
-**Tất cả API dưới đây cần Token!**
-- **Headers**: 
-  - `Content-Type: application/json`
-  - `Authorization: Bearer <token_vừa_lấy_được>`
-
-### 3. **Lấy danh sách môn thi**
-- **Method**: `GET`
-- **URL**: `http://localhost:3000/api/user/subjects`
-
-**Response:**
-```json
-[
-  {
-    "SubjectID": 1,
-    "SubjectName": "Toán học",
-    "Description": "Môn toán cơ bản"
-  },
-  {
-    "SubjectID": 2,
-    "SubjectName": "Tiếng Anh",
-    "Description": "Tiếng Anh giao tiếp"
-  }
-]
-```
-
----
-
-### 4. **Lấy câu hỏi của môn thi**
-- **Method**: `GET`
-- **URL**: `http://localhost:3000/api/user/questions/1`
-  (Số 1 là SubjectID)
-
-**Response:**
-```json
-[
-  {
-    "QuestionID": 1,
-    "QuestionText": "2 + 2 = ?",
-    "OptionA": "3",
-    "OptionB": "4",
-    "OptionC": "5",
-    "OptionD": "6"
-  }
-]
-```
-
----
-
-### 5. **Nộp bài thi**
+### 3. Đăng nhập nhanh bằng Google (Tính năng cao cấp)
 - **Method**: `POST`
-- **URL**: `http://localhost:3000/api/user/submit-exam`
+- **URL**: `{{baseUrl}}/auth/google-login`
+- **Body**: `{"credential": "TOKEN_GOOGLE_CỦA_BẠN"}`
+
+---
+
+## 📝 GIAI ĐOẠN 2: LUỒNG THI (EXAM FLOW)
+*Chứng minh logic thi trắc nghiệm hoạt động chuẩn xác.*
+
+### 4. Xem danh sách môn thi
+- **URL**: `GET {{baseUrl}}/user/subjects`
+- **Mục tiêu**: Show cho giảng viên thấy các môn học hiện có trong Database.
+
+### 5. Lấy đề thi (Câu hỏi)
+- **URL**: `GET {{baseUrl}}/user/questions/1`
+- **Giải thích**: Số `1` là mã môn thi (SubjectID). API này sẽ trả về danh sách câu hỏi để học sinh làm bài.
+
+### 6. Nộp bài và Chấm điểm tự động
+- **Method**: `POST`
+- **URL**: `{{baseUrl}}/user/exam/submit`
 - **Body**:
 ```json
 {
   "subjectId": 1,
   "answers": [
-    { "questionId": 1, "answer": "B" },
-    { "questionId": 2, "answer": "A" }
+    { "questionId": 1, "answer": "A" },
+    { "questionId": 2, "answer": "B" }
   ]
 }
 ```
+- **Kết quả**: Hệ thống sẽ trả về ngay lập tức: **Số câu đúng, Tổng điểm, Thời gian nộp**.
 
-**Response:**
-```json
-{
-  "message": "Nộp bài thành công!",
-  "score": 8.5,
-  "correctAnswers": 17,
-  "totalQuestions": 20
-}
-```
+### 7. Xem lại lịch sử thi
+- **URL**: `GET {{baseUrl}}/user/exam-history`
+- **Mục tiêu**: Chứng minh kết quả thi đã được lưu lại vĩnh viễn trong CSDL.
 
 ---
 
-### 6. **Xem lịch sử thi**
-- **Method**: `GET`
-- **URL**: `http://localhost:3000/api/user/history`
+## 👤 GIAI ĐOẠN 3: THÔNG TIN CÁ NHÂN (USER PROFILE)
+*Chứng minh tính năng quản lý profile và bảo mật.*
 
-**Response:**
-```json
-[
-  {
-    "ExamID": 1,
-    "SubjectName": "Toán học",
-    "Score": 8.5,
-    "ExamDate": "2026-02-23T10:30:00.000Z"
-  }
-]
-```
+### 8. Xem Profile & Upload Ảnh đại diện
+- **GET** `{{baseUrl}}/user/profile`: Xem thông tin hiện tại.
+- **POST** `{{baseUrl}}/user/upload-avatar`: (Dùng Body -> Form-data) để chọn 1 tấm ảnh làm đại diện.
+
+### 9. Đổi mật khẩu
+- **URL**: `PUT {{baseUrl}}/user/change-password`
+- **Body**: `{"oldPassword": "123", "newPassword": "456"}`
 
 ---
 
-## C. ADMIN API (`/api/admin`) - Dành cho quản trị viên
+## ⚙️ GIAI ĐOẠN 4: QUẢN TRỊ (ADMIN CONTROL)
+*Dành cho giảng viên muốn xem khả năng quản lý của hệ thống.*
 
-**Cần đăng nhập với tài khoản Admin!**
+### 10. Quản lý Môn học & Câu hỏi
+- **POST** `{{baseUrl}}/admin/subjects`: Thêm môn mới (ví dụ: "Lập trình Java").
+- **POST** `{{baseUrl}}/admin/questions`: Thêm câu hỏi khó vào môn học.
 
-### 7. **Thêm môn thi mới**
-- **Method**: `POST`
-- **URL**: `http://localhost:3000/api/admin/subjects`
-- **Headers**: `Authorization: Bearer <admin_token>`
-- **Body**:
-```json
-{
-  "subjectName": "Vật lý",
-  "description": "Môn vật lý cơ bản"
-}
-```
+### 11. Nhập đề thi từ Excel (Tính năng tối ưu)
+- **URL**: `POST {{baseUrl}}/admin/import-questions`
+- **Mục tiêu**: Thay vì nhập từng câu, Admin chỉ cần up 1 file Excel lên là có ngay đề thi 50 câu.
 
----
-
-### 8. **Thêm câu hỏi mới**
-- **Method**: `POST`
-- **URL**: `http://localhost:3000/api/admin/questions`
-- **Body**:
-```json
-{
-  "subjectId": 1,
-  "questionText": "3 + 5 = ?",
-  "optionA": "6",
-  "optionB": "7",
-  "optionC": "8",
-  "optionD": "9",
-  "correctAnswer": "C"
-}
-```
----
-
-### 9. **Xem tất cả lịch sử thi (toàn hệ thống)**
-- **Method**: `GET`
-- **URL**: `http://localhost:3000/api/admin/all-history`
+### 12. Quản lý người dùng (Quản trị viên)
+- **GET** `{{baseUrl}}/admin/users`: Xem danh sách tất cả thí sinh.
+- **DELETE** `{{baseUrl}}/admin/users/5`: Xóa một thí sinh vi phạm quy chế.
 
 ---
 
-### 10. **Xóa môn thi**
-- **Method**: `DELETE`
-- **URL**: `http://localhost:3000/api/admin/subjects/1`
-  (Số 1 là SubjectID cần xóa)
+## 💡 MẸO TRÌNH BÀY (PRESENTATION TIPS)
+1. **Dùng Collection**: Gom tất cả API này vào 1 Folder trong Postman tên là "BÁO CÁO ĐỒ ÁN".
+2. **Sắp xếp**: Đánh số thứ tự từ 1 đến 12 như trên để không bị rối khi giảng viên hỏi.
+3. **Thao tác nhanh**: Chuẩn bị sẵn các chuỗi JSON trong Body để chỉ cần nhấn **Send** là có kết quả ngay.
 
 ---
-
-### 11. **Cập nhật câu hỏi**
-- **Method**: `PUT`
-- **URL**: `http://localhost:3000/api/admin/questions/1`
-- **Body**:
-```json
-{
-  "questionText": "2 x 3 = ?",
-  "optionA": "5",
-  "optionB": "6",
-  "optionC": "7",
-  "optionD": "8",
-  "correctAnswer": "B"
-}
-
-
-
-
-
-
+*Chúc bạn có một buổi báo cáo thành công rực rỡ!* 🎓🏆
