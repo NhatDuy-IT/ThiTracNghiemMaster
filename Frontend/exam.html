@@ -217,6 +217,27 @@
         </div>
     </div>
 
+    <!-- Resume Fullscreen Modal -->
+    <div id="resumeFullscreenModal" class="fixed inset-0 bg-black/90 backdrop-blur-md hidden items-center justify-center z-[100] p-4">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-md w-full p-8 text-center border-2 border-red-500">
+            <div class="w-20 h-20 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg class="w-10 h-10 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                </svg>
+            </div>
+            <h2 class="text-2xl font-bold text-red-600 dark:text-red-500 mb-2">CẢNH BÁO VI PHẠM!</h2>
+            <p class="text-slate-600 dark:text-slate-400 mb-2 text-lg font-medium" id="warningReasonText"></p>
+            <p class="text-slate-500 dark:text-slate-500 mb-8 font-bold text-lg" id="warningCountText"></p>
+            
+            <button type="button" onclick="resumeFullscreenAndExam()" class="w-full px-6 py-4 bg-red-600 text-white rounded-xl font-bold text-lg hover:bg-red-700 transition-colors shadow-lg shadow-red-600/30 flex items-center justify-center gap-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
+                </svg>
+                Trở lại Toàn màn hình
+            </button>
+        </div>
+    </div>
+
     <script src="js/api.js"></script>
     <script>
         const urlParams = new URLSearchParams(window.location.search);
@@ -237,6 +258,10 @@
         let examSubmitted = false;
         let isSavingDraft = false;
         let savedDraft = null;
+        let flaggedQuestions = new Set();
+        let warningCount = 0;
+        const MAX_WARNINGS = 3;
+        let autoSaveInterval = null;
 
         function getAnsweredCount() {
             return Object.values(answers).filter(Boolean).length;
@@ -307,6 +332,13 @@
         function startExam() {
             if (examStarted) return;
 
+            // Yêu cầu Fullscreen
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen().catch((err) => {
+                    console.log("Lỗi fullscreen: ", err);
+                });
+            }
+
             examStarted = true;
             document.getElementById('startExamOverlay').style.display = 'none';
             document.getElementById('progressSection').style.display = 'block';
@@ -331,6 +363,16 @@
                     confirmSubmitAction();
                 }
             }, 1000);
+
+            // Tự động lưu bài mỗi 30s
+            autoSaveInterval = setInterval(() => {
+                if (getAnsweredCount() > 0 && examStarted && !examSubmitted && !isSavingDraft) {
+                    saveDraft(true);
+                }
+            }, 30000);
+
+            // Gắn sự kiện chống gian lận
+            setupAntiCheating();
         }
 
         function updateTimerDisplay() {
@@ -351,17 +393,10 @@
 
         async function loadSavedDraft() {
             try {
-                const response = await userAPI.getSavedExam(subjectId);
-
-                if (response.status === 404) {
-                    return null;
-                }
-
-                if (!response.ok) {
-                    throw new Error('Không thể tải bài lưu');
-                }
-
-                return await response.json();
+                const savedStr = localStorage.getItem(`draft_${subjectId}`);
+                if (!savedStr) return null;
+                const draft = JSON.parse(savedStr);
+                return draft;
             } catch (error) {
                 console.error('Load saved draft error:', error);
                 return null;
@@ -395,7 +430,14 @@
                 }
 
                 const response = await userAPI.getQuestions(subjectId);
-                questions = await response.json();
+                let fetchedQuestions = await response.json();
+
+                // Trộn câu hỏi (Shuffle Questions)
+                for (let i = fetchedQuestions.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [fetchedQuestions[i], fetchedQuestions[j]] = [fetchedQuestions[j], fetchedQuestions[i]];
+                }
+                questions = fetchedQuestions;
 
                 if (questions.length === 0) {
                     document.getElementById('questionsContainer').innerHTML = `
@@ -448,10 +490,16 @@
             container.innerHTML = questions.map((q, index) => `
                 <div class="question-item ${index === currentIndex ? '' : 'hidden'}" data-index="${index}">
                     <div class="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700">
-                        <h3 class="text-lg font-semibold text-slate-900 dark:text-white mb-6">
-                            <span class="text-primary mr-2">Câu ${index + 1}:</span>
-                            ${q.QuestionText}
-                        </h3>
+                        <div class="flex justify-between items-start mb-6">
+                            <h3 class="text-lg font-semibold text-slate-900 dark:text-white flex-1 pr-4">
+                                <span class="text-primary mr-2">Câu ${index + 1}:</span>
+                                ${q.QuestionText}
+                            </h3>
+                            <button type="button" onclick="toggleFlag(${q.QuestionID})" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-sm font-medium transition-colors ${flaggedQuestions.has(q.QuestionID) ? 'bg-amber-100 text-amber-700 border-amber-300 dark:bg-amber-900/40 dark:text-amber-400 dark:border-amber-700' : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100 dark:bg-slate-700 dark:text-slate-300 dark:border-slate-600 dark:hover:bg-slate-600'}" title="Đánh dấu câu hỏi này để xem lại sau">
+                                <svg class="w-4 h-4" fill="${flaggedQuestions.has(q.QuestionID) ? 'currentColor' : 'none'}" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" /></svg>
+                                <span>Đánh dấu</span>
+                            </button>
+                        </div>
                         <div class="space-y-3">
                             ${['A', 'B', 'C', 'D'].map(option => {
                                 const optionText = q['Option' + option];
@@ -471,12 +519,31 @@
             `).join('');
         }
 
+        function toggleFlag(questionId) {
+            if (flaggedQuestions.has(questionId)) {
+                flaggedQuestions.delete(questionId);
+            } else {
+                flaggedQuestions.add(questionId);
+            }
+            renderQuestions();
+            renderDots();
+        }
+
         function renderDots() {
             const container = document.getElementById('questionDots');
-            container.innerHTML = questions.map((_, index) => `
-                <button class="w-3 h-3 rounded-full ${index === currentIndex ? 'bg-primary' : answers[questions[index].QuestionID] ? 'bg-green-500' : 'bg-slate-300 dark:bg-slate-600'}"
-                    onclick="goToQuestion(${index})"></button>
-            `).join('');
+            container.innerHTML = questions.map((_, index) => {
+                const qId = questions[index].QuestionID;
+                const isCurrent = index === currentIndex;
+                const isAnswered = answers[qId];
+                const isFlagged = flaggedQuestions.has(qId);
+                
+                let dotClass = 'bg-slate-300 dark:bg-slate-600 hover:bg-slate-400';
+                if (isCurrent) dotClass = 'bg-primary ring-2 ring-primary ring-offset-2 dark:ring-offset-slate-900 pointer-events-none scale-110';
+                else if (isFlagged) dotClass = 'bg-amber-400 shadow-sm hover:bg-amber-500';
+                else if (isAnswered) dotClass = 'bg-green-500 shadow-sm hover:bg-green-600';
+                
+                return '<button class="w-3.5 h-3.5 mx-0.5 rounded-full transition-all ' + dotClass + '" onclick="goToQuestion(' + index + ')" title="Câu ' + (index + 1) + '"></button>';
+            }).join('');
         }
 
         function selectAnswer(questionId, answer) {
@@ -539,16 +606,12 @@
             }
 
             try {
-                const response = await userAPI.saveExamDraft(getSavePayload());
-                const result = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(result.error || result.message || 'Lưu bài thất bại');
-                }
-
-                savedDraft = result;
+                const payload = getSavePayload();
+                localStorage.setItem(`draft_${subjectId}`, JSON.stringify(payload));
+                savedDraft = payload;
+                
                 if (!isAutoSave) {
-                    setSaveStatus('Đã lưu bài', 'success');
+                    setSaveStatus('Đã lưu bài cục bộ', 'success');
                 }
                 return true;
             } catch (error) {
@@ -568,13 +631,78 @@
 
         async function clearSavedDraft() {
             try {
-                const response = await userAPI.deleteSavedExam(subjectId);
-                if (response.ok || response.status === 404) {
-                    savedDraft = null;
-                }
+                localStorage.removeItem(`draft_${subjectId}`);
+                savedDraft = null;
             } catch (error) {
                 console.error('Delete saved draft error:', error);
             }
+        }
+
+        function handleCheatingViolation(reason) {
+            if (!examStarted || examSubmitted) return;
+            
+            warningCount++;
+            
+            if (warningCount >= MAX_WARNINGS) {
+                examSubmitted = true; // Khóa ngay lập tức tránh sự kiện nổ chồng chéo
+                alert(`CẢNH BÁO KỶ LUẬT: ${reason}\n\nBạn đã vi phạm quá ${MAX_WARNINGS} lần! Bài thi của bạn đã bị thu và hệ thống sẽ đẩy bạn ra ngoài.`);
+                
+                // Thu bài ngầm
+                const answerList = Object.entries(answers).map(([questionId, answer]) => ({
+                    questionId: parseInt(questionId),
+                    answer: answer
+                }));
+                
+                userAPI.submitExam(subjectId, answerList).finally(() => {
+                    clearSavedDraft().then(() => {
+                        window.location.replace('home.html');
+                    });
+                });
+            } else {
+                document.getElementById('warningReasonText').textContent = reason;
+                document.getElementById('warningCountText').textContent = `Lần vi phạm: ${warningCount}/${MAX_WARNINGS}`;
+                document.getElementById('resumeFullscreenModal').classList.remove('hidden');
+                document.getElementById('resumeFullscreenModal').classList.add('flex');
+            }
+        }
+
+        function resumeFullscreenAndExam() {
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen().catch(err => console.error("Lỗi fullscreen", err));
+            }
+            document.getElementById('resumeFullscreenModal').classList.add('hidden');
+            document.getElementById('resumeFullscreenModal').classList.remove('flex');
+        }
+
+        function setupAntiCheating() {
+            document.addEventListener('contextmenu', e => e.preventDefault());
+            document.addEventListener('copy', e => e.preventDefault());
+            document.addEventListener('paste', e => e.preventDefault());
+            document.addEventListener('cut', e => e.preventDefault());
+            
+            document.addEventListener('keydown', e => {
+                if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key)) || (e.ctrlKey && e.key === 'U')) {
+                    e.preventDefault();
+                }
+            });
+
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'hidden') {
+                    handleCheatingViolation("Bạn đã rời khỏi trang làm bài (chuyển tab, ứng dụng khác).");
+                }
+            });
+
+            window.addEventListener('blur', () => {
+                if(examStarted && !examSubmitted) {
+                    handleCheatingViolation("Bạn đã bấm ra ngoài cửa sổ trình duyệt làm bài thi.");
+                }
+            });
+            
+            document.addEventListener('fullscreenchange', () => {
+                if (!document.fullscreenElement && examStarted && !examSubmitted) {
+                    handleCheatingViolation("Bạn đã thoát chế độ Toàn màn hình. Hãy trở lại bài thi ngay!");
+                }
+            });
         }
 
         function submitExam() {
@@ -629,6 +757,7 @@
                 if (response.ok) {
                     examSubmitted = true;
                     clearInterval(timerInterval);
+                    if (autoSaveInterval) clearInterval(autoSaveInterval);
                     await clearSavedDraft();
 
                     document.getElementById('resultScore').textContent = result.score;
@@ -661,28 +790,8 @@
             if (!examStarted || examSubmitted || !hasDraftProgress()) {
                 return;
             }
-
-            const token = localStorage.getItem('token');
-            if (!token) return;
-
-            const payload = JSON.stringify(getSavePayload());
-            const url = `${BASE_URL}/user/saved-exams`;
-
-            if (navigator.sendBeacon) {
-                const blob = new Blob([payload], { type: 'application/json' });
-                navigator.sendBeacon(url, blob);
-                return;
-            }
-
-            fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: payload,
-                keepalive: true
-            }).catch(() => {});
+            // Tự động lưu bài tĩnh khi thoát trang
+            localStorage.setItem(`draft_${subjectId}`, JSON.stringify(getSavePayload()));
         });
 
         loadQuestions();

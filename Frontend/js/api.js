@@ -48,6 +48,13 @@ const authAPI = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, password, fullName, email })
+        }),
+
+    googleLogin: (credential) =>
+        fetch(`${BASE_URL}/auth/google-login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ credential })
         })
 };
 
