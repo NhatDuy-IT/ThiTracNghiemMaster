@@ -118,7 +118,16 @@ const userAPI = {
             }
             return response;
         });
-    }
+    },
+
+    // Feedback
+    sendFeedback: (data) => authenticatedFetch(`${BASE_URL}/user/feedback`, {
+        method: 'POST',
+        body: JSON.stringify(data)
+    }),
+
+    // Announcements
+    getAnnouncements: () => authenticatedFetch(`${BASE_URL}/user/announcements`)
 };
 
 // API Admin
@@ -213,7 +222,37 @@ const adminAPI = {
             }
             return response;
         });
-    }
+    },
+
+    // Categories
+    getCategories: () => authenticatedFetch(`${BASE_URL}/admin/categories`),
+    createCategory: (data) => authenticatedFetch(`${BASE_URL}/admin/categories`, {
+        method: 'POST',
+        body: JSON.stringify(data)
+    }),
+
+    // Announcements
+    createAnnouncement: (data) => authenticatedFetch(`${BASE_URL}/admin/announcements`, {
+        method: 'POST',
+        body: JSON.stringify(data)
+    }),
+
+    // Feedbacks
+    getFeedbacks: () => authenticatedFetch(`${BASE_URL}/admin/feedbacks`)
+};
+
+// API Lớp học
+const classAPI = {
+    getAllClasses: () => authenticatedFetch(`${BASE_URL}/class`),
+    createClass: (data) => authenticatedFetch(`${BASE_URL}/class`, {
+        method: 'POST',
+        body: JSON.stringify(data)
+    }),
+    addMember: (data) => authenticatedFetch(`${BASE_URL}/class/add-member`, {
+        method: 'POST',
+        body: JSON.stringify(data)
+    }),
+    getClassMembers: (classId) => authenticatedFetch(`${BASE_URL}/class/${classId}/members`)
 };
 
 // Logout function

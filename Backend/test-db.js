@@ -1,14 +1,13 @@
 
-// BẮT BUỘC phải require 'mssql/msnodesqlv8' thay vì 'mssql' thông thường
 const sql = require('mssql/msnodesqlv8');
 
 const config = {
-    server: 'MSI\\SQLEXPRESS01', // Lưu ý: Phải dùng 2 dấu gạch chéo ngược (\\)
+    server: 'MSI\\SQLEXPRESS01', 
     database: 'TracNghiemWebSite',
     driver: 'msnodesqlv8',
     options: {
-        trustedConnection: true, // Dòng này khai báo sử dụng Windows Authentication
-        encrypt: false           // Tắt mã hóa khi chạy localhost
+        trustedConnection: true,
+        encrypt: false          
     }
 };
 
@@ -31,6 +30,4 @@ async function testConnection() {
         console.error(error.message);
     }
 }
-
-// Gọi hàm chạy thử
 testConnection();

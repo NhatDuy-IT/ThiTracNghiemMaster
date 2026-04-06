@@ -65,4 +65,14 @@ router.get('/download-template', adminController.downloadTemplate);
 // Import questions from Excel
 router.post('/import-questions', uploadExcel, adminController.importQuestions);
 
+// ==================== CATEGORIES (Danh mục) ====================
+router.get('/categories', adminController.getAllCategories);
+router.post('/categories', adminController.createCategory);
+
+// ==================== ANNOUNCEMENTS (Thông báo) ====================
+router.post('/announcements', adminController.createAnnouncement);
+
+// ==================== FEEDBACKS (Phản hồi) ====================
+router.get('/feedbacks', adminController.getAllFeedbacks);
+
 module.exports = router;

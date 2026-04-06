@@ -7,6 +7,7 @@ const { connectDB } = require('./database');
 const authRoutes = require('./routes/auth');
 const adminRoutes = require('./routes/admin');
 const userRoutes = require('./routes/user');
+const classRoutes = require('./routes/class');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -22,6 +23,7 @@ app.use('/api/images', express.static(path.join(__dirname, 'wwwroot/images')));
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/user', userRoutes);
+app.use('/api/class', classRoutes);
 
 // Route mặc định
 app.get('/', (req, res) => {

@@ -77,6 +77,7 @@ const userController = {
 
     // Nộp bài và chấm điểm
     submitExam: async (req, res) => {
+        let pool;
         try {
             const { subjectId, answers } = req.body; // answers: [{ questionId: 1, answer: 'A' }, ...]
             const userId = req.user.userId;
@@ -85,7 +86,7 @@ const userController = {
                 return res.status(400).json({ error: 'Thiếu thông tin bài thi' });
             }
 
-            const pool = await connectDB();
+            pool = await connectDB();
 
             // Lấy tất cả câu hỏi của môn thi
             const questionsResult = await pool.request()
@@ -105,7 +106,6 @@ const userController = {
                 questionMap[q.QuestionID] = q.CorrectAnswer;
             });
 
-            // Tạo mảng kết quả chi tiết
             const results = answers.map(answer => {
                 const correctAnswer = questionMap[answer.questionId];
                 const isCorrect = correctAnswer && correctAnswer.toUpperCase() === (answer.answer || '').toUpperCase();
@@ -118,29 +118,55 @@ const userController = {
                 };
             });
 
-            // Tính điểm (số câu đúng / tổng số câu * 10)
             const totalQuestions = questions.length;
             const score = Math.round((correctCount / totalQuestions) * 10 * 10) / 10;
 
-            // Lưu vào lịch sử thi
-            await pool.request()
-                .input('userId', sql.Int, userId)
-                .input('subjectId', sql.Int, subjectId)
-                .input('score', sql.Float, score)
-                .input('totalQuestions', sql.Int, totalQuestions)
-                .input('correctAnswers', sql.Int, correctCount)
-                .query(`
-                    INSERT INTO ExamHistory (UserID, SubjectID, Score, TotalQuestions, CorrectAnswers)
-                    VALUES (@userId, @subjectId, @score, @totalQuestions, @correctAnswers)
-                `);
+            // Bắt đầu Transaction để lưu vào 2 bảng
+            const transaction = new sql.Transaction(pool);
+            await transaction.begin();
 
-            res.json({
-                message: 'Nộp bài thành công',
-                score: score,
-                totalQuestions: totalQuestions,
-                correctAnswers: correctCount,
-                results: results
-            });
+            try {
+                // 1. Lưu vào ExamHistory
+                const historyResult = await new sql.Request(transaction)
+                    .input('userId', sql.Int, userId)
+                    .input('subjectId', sql.Int, subjectId)
+                    .input('score', sql.Float, score)
+                    .input('totalQuestions', sql.Int, totalQuestions)
+                    .input('correctAnswers', sql.Int, correctCount)
+                    .query(`
+                        INSERT INTO ExamHistory (UserID, SubjectID, Score, TotalQuestions, CorrectAnswers)
+                        VALUES (@userId, @subjectId, @score, @totalQuestions, @correctAnswers);
+                        SELECT SCOPE_IDENTITY() as ExamID;
+                    `);
+
+                const examId = historyResult.recordset[0].ExamID;
+
+                // 2. Lưu vào ExamDetails (Lưu từng câu trả lời)
+                for (const resItem of results) {
+                    await new sql.Request(transaction)
+                        .input('examId', sql.Int, examId)
+                        .input('questionId', sql.Int, resItem.questionId)
+                        .input('userAnswer', sql.Char(1), resItem.userAnswer || null)
+                        .input('isCorrect', sql.Bit, resItem.isCorrect ? 1 : 0)
+                        .query(`
+                            INSERT INTO ExamDetails (ExamID, QuestionID, UserAnswer, IsCorrect)
+                            VALUES (@examId, @questionId, @userAnswer, @isCorrect)
+                        `);
+                }
+
+                await transaction.commit();
+
+                res.json({
+                    message: 'Nộp bài thành công',
+                    score: score,
+                    totalQuestions: totalQuestions,
+                    correctAnswers: correctCount,
+                    results: results
+                });
+            } catch (err) {
+                await transaction.rollback();
+                throw err;
+            }
         } catch (error) {
             console.error('Lỗi nộp bài:', error);
             res.status(500).json({ error: 'Lỗi server' });
@@ -307,6 +333,38 @@ const userController = {
             });
         } catch (error) {
             console.error('Lỗi upload avatar:', error);
+            res.status(500).json({ error: 'Lỗi server' });
+        }
+    },
+
+    // ==================== FEEDBACK (Gửi phản hồi) ====================
+
+    sendFeedback: async (req, res) => {
+        try {
+            const { subjectId, message } = req.body;
+            const userId = req.user.userId;
+            const pool = await connectDB();
+
+            await pool.request()
+                .input('userId', sql.Int, userId)
+                .input('subjectId', sql.Int, subjectId || null)
+                .input('message', sql.NVarChar, message)
+                .query('INSERT INTO Feedbacks (UserID, SubjectID, Message) VALUES (@userId, @subjectId, @message)');
+
+            res.status(201).json({ message: 'Gửi phản hồi thành công' });
+        } catch (error) {
+            res.status(500).json({ error: 'Lỗi server' });
+        }
+    },
+
+    // ==================== ANNOUNCEMENTS (Thông báo) ====================
+
+    getAnnouncements: async (req, res) => {
+        try {
+            const pool = await connectDB();
+            const result = await pool.request().query('SELECT * FROM Announcements WHERE IsActive = 1 ORDER BY CreatedAt DESC');
+            res.json(result.recordset);
+        } catch (error) {
             res.status(500).json({ error: 'Lỗi server' });
         }
     }

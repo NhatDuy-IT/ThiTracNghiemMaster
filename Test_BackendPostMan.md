@@ -72,18 +72,28 @@
 
 ### 9. Đổi mật khẩu
 - **URL**: `PUT {{baseUrl}}/user/change-password`
-- **Body**: `{"oldPassword": "123", "newPassword": "456"}`
+- **Body**: `{"currentPassword": "123", "newPassword": "456"}`
 
 
 ## ⚙️ GIAI ĐOẠN 4: QUẢN TRỊ (ADMIN CONTROL)
 
 ### 10. Quản lý Môn học & Câu hỏi
-- **POST** `{{baseUrl}}/admin/subjects`: Thêm môn mới (ví dụ: "Lập trình Java").
-- **POST** `{{baseUrl}}/admin/questions`: Thêm câu hỏi khó vào môn học.
+- **POST** `{{baseUrl}}/admin/subjects`: Thêm môn mới.
+  - Body: `{"subjectName": "Java", "description": "...", "duration": 60}`
+- **POST** `{{baseUrl}}/admin/questions`: Thêm câu hỏi mới.
+  - Body: 
+    ```json
+    {
+      "subjectId": 1,
+      "questionText": "Câu hỏi?",
+      "optionA": "...", "optionB": "...", "optionC": "...", "optionD": "...",
+      "correctAnswer": "A"
+    }
+    ```
 
 ### 11. Nhập đề thi từ Excel (Tính năng tối ưu)
 - **URL**: `POST {{baseUrl}}/admin/import-questions`
-- **Mục tiêu**: Thay vì nhập từng câu, Admin chỉ cần up 1 file Excel lên là có ngay đề thi 50 câu.
+- **Cách dùng**: Trong Postman chọn **Body** -> **form-data**. Tạo key `file`, chọn kiểu **File** và upload file Excel mẫu.
 
 ### 12. Quản lý người dùng (Quản trị viên)
 - **GET** `{{baseUrl}}/admin/users`: Xem danh sách tất cả thí sinh.

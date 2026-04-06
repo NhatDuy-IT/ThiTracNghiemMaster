@@ -524,7 +524,7 @@ const adminController = {
                 return res.status(400).json({ error: 'Mật khẩu phải có ít nhất 6 ký tự' });
             }
 
-            const bcrypt = require('bcrypt');
+            const bcrypt = require('bcryptjs');
             const hashedPassword = await bcrypt.hash(newPassword, 10);
 
             const pool = await connectDB();
@@ -633,6 +633,68 @@ const adminController = {
 
         } catch (error) {
             console.error('Lỗi nhập câu hỏi:', error);
+            res.status(500).json({ error: 'Lỗi server' });
+        }
+    },
+
+    // ==================== CATEGORIES (Danh mục) ====================
+
+    getAllCategories: async (req, res) => {
+        try {
+            const pool = await connectDB();
+            const result = await pool.request().query('SELECT * FROM Categories ORDER BY CategoryName');
+            res.json(result.recordset);
+        } catch (error) {
+            res.status(500).json({ error: 'Lỗi server' });
+        }
+    },
+
+    createCategory: async (req, res) => {
+        try {
+            const { categoryName, description } = req.body;
+            const pool = await connectDB();
+            await pool.request()
+                .input('name', sql.NVarChar, categoryName)
+                .input('desc', sql.NVarChar, description || '')
+                .query('INSERT INTO Categories (CategoryName, Description) VALUES (@name, @desc)');
+            res.status(201).json({ message: 'Thêm danh mục thành công' });
+        } catch (error) {
+            res.status(500).json({ error: 'Lỗi server' });
+        }
+    },
+
+    // ==================== ANNOUNCEMENTS (Thông báo) ====================
+
+    createAnnouncement: async (req, res) => {
+        try {
+            const { title, content } = req.body;
+            const adminId = req.user.userId;
+            const pool = await connectDB();
+            await pool.request()
+                .input('adminId', sql.Int, adminId)
+                .input('title', sql.NVarChar, title)
+                .input('content', sql.NVarChar, content)
+                .query('INSERT INTO Announcements (AdminID, Title, Content) VALUES (@adminId, @title, @content)');
+            res.status(201).json({ message: 'Đăng thông báo thành công' });
+        } catch (error) {
+            res.status(500).json({ error: 'Lỗi server' });
+        }
+    },
+
+    // ==================== FEEDBACKS (Phản hồi) ====================
+
+    getAllFeedbacks: async (req, res) => {
+        try {
+            const pool = await connectDB();
+            const result = await pool.request().query(`
+                SELECT f.*, u.FullName, s.SubjectName 
+                FROM Feedbacks f
+                JOIN Users u ON f.UserID = u.UserID
+                LEFT JOIN Subjects s ON f.SubjectID = s.SubjectID
+                ORDER BY f.CreatedAt DESC
+            `);
+            res.json(result.recordset);
+        } catch (error) {
             res.status(500).json({ error: 'Lỗi server' });
         }
     }

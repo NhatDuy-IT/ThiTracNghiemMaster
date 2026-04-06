@@ -35,4 +35,10 @@ router.put('/change-password', userController.changePassword);
 // Upload avatar
 router.post('/upload-avatar', uploadAvatar, userController.uploadAvatar);
 
+// ==================== FEEDBACK (Phản hồi) ====================
+router.post('/feedback', userController.sendFeedback);
+
+// ==================== ANNOUNCEMENTS (Thông báo) ====================
+router.get('/announcements', userController.getAnnouncements);
+
 module.exports = router;
