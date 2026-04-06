@@ -205,6 +205,48 @@ const userController = {
         }
     },
 
+    // Lấy chi tiết bài thi (Câu hỏi + Đáp án của User)
+    getExamDetails: async (req, res) => {
+        try {
+            const { examId } = req.params;
+            const userId = req.user.userId;
+            const pool = await connectDB();
+
+            const result = await pool.request()
+                .input('examId', sql.Int, examId)
+                .input('userId', sql.Int, userId)
+                .query(`
+                    SELECT 
+                        ed.DetailID,
+                        ed.ExamID,
+                        ed.QuestionID,
+                        ed.UserAnswer,
+                        ed.IsCorrect,
+                        q.QuestionText,
+                        q.OptionA,
+                        q.OptionB,
+                        q.OptionC,
+                        q.OptionD,
+                        q.CorrectAnswer,
+                        q.Explanation
+                    FROM ExamDetails ed
+                    INNER JOIN ExamHistory eh ON ed.ExamID = eh.ExamID
+                    INNER JOIN Questions q ON ed.QuestionID = q.QuestionID
+                    WHERE ed.ExamID = @examId AND eh.UserID = @userId
+                    ORDER BY ed.DetailID ASC
+                `);
+
+            if (result.recordset.length === 0) {
+                return res.status(404).json({ error: 'Không tìm thấy chi tiết bài thi' });
+            }
+
+            res.json(result.recordset);
+        } catch (error) {
+            console.error('Lỗi lấy chi tiết bài thi:', error);
+            res.status(500).json({ error: 'Lỗi server' });
+        }
+    },
+
     // ==================== PROFILE (Thông tin cá nhân) ====================
 
     // Lấy thông tin profile

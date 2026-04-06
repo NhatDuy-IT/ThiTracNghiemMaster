@@ -21,6 +21,8 @@ router.post('/exam/submit', userController.submitExam);
 // ==================== EXAM HISTORY (Lịch sử thi) ====================
 // Lấy lịch sử điểm thi của cá nhân
 router.get('/exam-history', userController.getMyExamHistory);
+// Lấy chi tiết bài thi
+router.get('/exam-details/:examId', userController.getExamDetails);
 
 // ==================== PROFILE (Thông tin cá nhân) ====================
 // Lấy thông tin profile

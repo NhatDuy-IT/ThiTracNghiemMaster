@@ -70,6 +70,7 @@ const userAPI = {
     }),
     
     getExamHistory: () => authenticatedFetch(`${BASE_URL}/user/exam-history`),
+    getExamDetails: (examId) => authenticatedFetch(`${BASE_URL}/user/exam-details/${examId}`),
 
     getSavedExams: () => authenticatedFetch(`${BASE_URL}/user/saved-exams`),
 
@@ -226,19 +227,24 @@ const adminAPI = {
 
     // Categories
     getCategories: () => authenticatedFetch(`${BASE_URL}/admin/categories`),
+    updateCategory: (id, data) => authenticatedFetch(`${BASE_URL}/admin/categories/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+    deleteCategory: (id) => authenticatedFetch(`${BASE_URL}/admin/categories/${id}`, { method: 'DELETE' }),
     createCategory: (data) => authenticatedFetch(`${BASE_URL}/admin/categories`, {
         method: 'POST',
         body: JSON.stringify(data)
     }),
 
     // Announcements
-    createAnnouncement: (data) => authenticatedFetch(`${BASE_URL}/admin/announcements`, {
-        method: 'POST',
-        body: JSON.stringify(data)
-    }),
+    getAnnouncements: () => authenticatedFetch(`${BASE_URL}/admin/announcements`),
+    createAnnouncement: (data) => authenticatedFetch(`${BASE_URL}/admin/announcements`, { method: 'POST', body: JSON.stringify(data) }),
+    updateAnnouncement: (id, data) => authenticatedFetch(`${BASE_URL}/admin/announcements/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+    deleteAnnouncement: (id) => authenticatedFetch(`${BASE_URL}/admin/announcements/${id}`, { method: 'DELETE' }),
 
     // Feedbacks
-    getFeedbacks: () => authenticatedFetch(`${BASE_URL}/admin/feedbacks`)
+    getFeedbacks: () => authenticatedFetch(`${BASE_URL}/admin/feedbacks`),
+    deleteFeedback: (id) => authenticatedFetch(`${BASE_URL}/admin/feedbacks/${id}`, {
+        method: 'DELETE'
+    })
 };
 
 // API Lớp học
@@ -252,6 +258,9 @@ const classAPI = {
         method: 'POST',
         body: JSON.stringify(data)
     }),
+    updateClass: (id, data) => authenticatedFetch(`${BASE_URL}/class/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+    deleteClass: (id) => authenticatedFetch(`${BASE_URL}/class/${id}`, { method: 'DELETE' }),
+    removeMember: (data) => authenticatedFetch(`${BASE_URL}/class/remove-member`, { method: 'DELETE', body: JSON.stringify(data) }),
     getClassMembers: (classId) => authenticatedFetch(`${BASE_URL}/class/${classId}/members`)
 };
 

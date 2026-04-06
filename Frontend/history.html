@@ -116,12 +116,34 @@
                         <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase">Điểm số</th>
                         <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase">Số câu đúng</th>
                         <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase">Ngày thi</th>
+                        <th class="px-6 py-3 text-right text-xs font-bold text-slate-500 uppercase">Thao tác</th>
                     </tr>
                 </thead>
                 <tbody id="historyTableBody" class="divide-y divide-slate-200 dark:divide-slate-700">
                     <tr><td colspan="5" class="px-6 py-8 text-center text-slate-500">Đang tải...</td></tr>
                 </tbody>
             </table>
+        </div>
+
+        <!-- Details Modal -->
+        <div id="detailsModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-[100] p-4">
+            <div class="bg-background-light dark:bg-background-dark w-full max-w-4xl h-[90vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden border border-slate-200 dark:border-slate-800">
+                <div class="flex items-center justify-between p-6 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800">
+                    <div>
+                        <h3 class="text-2xl font-black text-slate-900 dark:text-white">Chi tiết bài thi</h3>
+                        <p class="text-sm text-slate-500">Xem lại từng câu hỏi và đáp án của bạn</p>
+                    </div>
+                    <button onclick="closeDetails()" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl transition-colors text-slate-500">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+                <div class="p-8 overflow-y-auto flex-1" id="detailsContainer">
+                    <!-- Questions will be rendered here -->
+                </div>
+                <div class="p-6 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 flex justify-end">
+                    <button onclick="closeDetails()" class="px-8 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl font-bold transition-transform hover:scale-105">Đóng</button>
+                </div>
+            </div>
         </div>
     </main>
 
@@ -174,13 +196,100 @@
                             </td>
                             <td class="px-6 py-4 text-slate-600 dark:text-slate-300">${h.CorrectAnswers}/${h.TotalQuestions}</td>
                             <td class="px-6 py-4 text-slate-500">${new Date(h.ExamDate).toLocaleString('vi-VN')}</td>
+                            <td class="px-6 py-4 text-right">
+                                <button onclick="showExamDetails(${h.ExamID})" class="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 hover:bg-primary/20 text-primary rounded-lg transition-all font-bold">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                    Chi tiết
+                                </button>
+                            </td>
                         </tr>
                     `;
                 }).join('');
             } catch (error) {
                 console.error('Error:', error);
-                document.getElementById('historyTableBody').innerHTML = '<tr><td colspan="5" class="px-6 py-8 text-center text-red-500">Lỗi tải dữ liệu</td></tr>';
+                document.getElementById('historyTableBody').innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-red-500">Lỗi tải dữ liệu</td></tr>';
             }
+        }
+
+        async function showExamDetails(examId) {
+            try {
+                const response = await userAPI.getExamDetails(examId);
+                const data = await response.json();
+                
+                if (response.status === 404) {
+                    alert('Bài thi này không có dữ liệu chi tiết (có thể do được thực hiện trước khi hệ thống cập nhật tính năng lưu câu trả lời).');
+                    return;
+                }
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Lỗi không xác định');
+                }
+
+                if (!Array.isArray(data)) {
+                    throw new Error('Dữ liệu không hợp lệ');
+                }
+                
+                const container = document.getElementById('detailsContainer');
+                document.getElementById('detailsModal').classList.remove('hidden');
+                document.getElementById('detailsModal').classList.add('flex');
+                
+                container.innerHTML = data.map((d, index) => {
+                    const isCorrect = d.IsCorrect;
+                    const statusClass = isCorrect ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800' : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800';
+                    const statusText = isCorrect ? 'Đúng' : 'Sai';
+                    const icon = isCorrect ? 
+                        `<svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>` :
+                        `<svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>`;
+
+                    return `
+                        <div class="p-6 rounded-2xl border ${statusClass} mb-6">
+                            <div class="flex items-start justify-between gap-4 mb-4">
+                                <div class="flex gap-3">
+                                    <span class="flex-shrink-0 w-8 h-8 rounded-lg bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700 flex items-center justify-center font-black text-slate-900 dark:text-white">${index + 1}</span>
+                                    <h4 class="text-lg font-bold text-slate-900 dark:text-white pt-1">${d.QuestionText}</h4>
+                                </div>
+                                <div class="flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold ${isCorrect ? 'text-green-600 bg-white' : 'text-red-500 bg-white'} shadow-sm">
+                                    ${icon} ${statusText}
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+                                ${['A', 'B', 'C', 'D'].map(opt => {
+                                    const optText = d['Option' + opt];
+                                    const isUserAnswer = d.UserAnswer === opt;
+                                    const isCorrectOpt = d.CorrectAnswer === opt;
+                                    
+                                    let optClass = 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400';
+                                    if (isCorrectOpt) optClass = 'bg-green-500 text-white border-green-500 font-bold';
+                                    else if (isUserAnswer && !isCorrect) optClass = 'bg-red-500 text-white border-red-500 font-bold';
+
+                                    return `
+                                        <div class="p-4 rounded-xl border ${optClass} flex items-center gap-3">
+                                            <span class="w-6 h-6 rounded-lg flex items-center justify-center text-xs border border-current">${opt}</span>
+                                            <span>${optText}</span>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                            
+                            ${d.Explanation ? `
+                                <div class="mt-4 p-4 bg-white/50 dark:bg-slate-800/50 rounded-xl border border-dashed border-slate-300 dark:border-slate-600">
+                                    <p class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Lời giải:</p>
+                                    <p class="text-sm text-slate-700 dark:text-slate-300">${d.Explanation}</p>
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                }).join('');
+            } catch (error) {
+                console.error('Error loading details:', error);
+                alert('Lỗi: ' + error.message);
+            }
+        }
+
+        function closeDetails() {
+            document.getElementById('detailsModal').classList.add('hidden');
+            document.getElementById('detailsModal').classList.remove('flex');
         }
 
         function logout() {
